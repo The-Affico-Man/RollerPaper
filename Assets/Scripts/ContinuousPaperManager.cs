@@ -7,7 +7,8 @@ public class ContinuousPaperManager : MonoBehaviour
 {
     [Header("UI")]
     public TextMeshProUGUI paperLengthText;
-
+    private float totalLengthPulled = 0f;
+    private SwipeController swipeController;
     [Header("Paper Settings")]
     public GameObject longPaperPrefab; // A long paper tile model (e.g., 10 segments long)
     public Transform paperSpawnPoint; // Where new paper tiles spawn (at/above the toilet roll)
@@ -32,6 +33,7 @@ public class ContinuousPaperManager : MonoBehaviour
 
     void Start()
     {
+        swipeController = FindFirstObjectByType<SwipeController>();
         // Find components
         paperRoller = FindFirstObjectByType<PaperRoller>();
         //if (paperCamera == null)
@@ -48,18 +50,21 @@ public class ContinuousPaperManager : MonoBehaviour
     {
         UpdatePaperSpawning();
         CullOffScreenTiles();
+
         UpdatePaperLengthUI();
 
     }
     void UpdatePaperLengthUI()
     {
-        if (paperLengthText != null)
+        if (paperLengthText != null && paperRoller != null)
         {
-            float totalLengthUnityUnits = GetTotalPaperLength();
-            float totalLengthMeters = totalLengthUnityUnits * 0.1f; // Convert to real meters
+            float totalLengthMeters = swipeController.TotalSwipeDistance * 0.1f; // Convert Unity units to meters
             paperLengthText.text = $"Paper Pulled: {totalLengthMeters:F2} m";
         }
     }
+
+
+
 
 
     void SetupPaperClipping()
@@ -116,6 +121,7 @@ public class ContinuousPaperManager : MonoBehaviour
 
         // Add to front of list (newest tiles at front)
         activePaperTiles.Insert(0, newTile);
+        totalLengthPulled += paperTileLength;
 
         // Apply clipping effect
         ApplyClippingToTile(newTile);
@@ -222,13 +228,9 @@ public class ContinuousPaperManager : MonoBehaviour
 
     public float GetTotalPaperLength()
     {
-        // Calculate based on how far the paper has moved
-        if (paperRoller != null && paperSpawnPoint != null)
-        {
-            return Mathf.Abs(paperSpawnPoint.position.y - paperRoller.transform.position.y);
-        }
-        return 0f;
+        return totalLengthPulled;
     }
+
 
     [ContextMenu("Clear All Paper")]
     public void ClearAllPaper()

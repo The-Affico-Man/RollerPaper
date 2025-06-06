@@ -2,7 +2,11 @@ using UnityEngine;
 
 public class PaperRoller : MonoBehaviour
 {
-    public SwipeController swipeController; // Drag in inspector
+    private SwipeController swipeController;
+    private float totalSwipeDistance = 0f; // Accumulated swipe distance in Unity units
+    public float TotalSwipeDistance => totalSwipeDistance;
+
+
     public float baseSpeed = 0.005f;
     public float speedMultiplier = 1f;
 
@@ -11,6 +15,7 @@ public class PaperRoller : MonoBehaviour
     void Start()
     {
         startPos = transform.position;
+        swipeController = FindFirstObjectByType<SwipeController>();
     }
 
     void Update()
@@ -22,6 +27,11 @@ public class PaperRoller : MonoBehaviour
         {
             float movement = Mathf.Abs(swipe.y) * baseSpeed * speedMultiplier;
             transform.position += Vector3.down * movement;
+        }
+        if (swipeController.SwipeDelta.y < 0f) // Only down swipes
+        {
+            float swipeAmount = -swipeController.SwipeDelta.y * Time.deltaTime; // Make positive
+            totalSwipeDistance += swipeAmount;
         }
     }
 

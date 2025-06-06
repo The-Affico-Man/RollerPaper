@@ -8,7 +8,8 @@ public class SwipeController : MonoBehaviour
     public Vector2 SwipeDelta => swipeDelta;
 
     private Vector2 lastMousePosition;
-
+    private float totalSwipeDistance = 0f; // Accumulated swipe distance in Unity units
+    public float TotalSwipeDistance => totalSwipeDistance;
     private void Awake()
     {
         controls = new GameControls();
@@ -30,6 +31,11 @@ public class SwipeController : MonoBehaviour
 
     private void Update()
     {
+        if (SwipeDelta.y < 0f) // Only down swipes
+        {
+            float swipeAmount = -SwipeDelta.y * Time.deltaTime; // Make positive
+            totalSwipeDistance += swipeAmount;
+        }
 #if UNITY_EDITOR
         // Emulate swipe with mouse drag
         if (Mouse.current.leftButton.isPressed)
