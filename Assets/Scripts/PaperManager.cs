@@ -27,7 +27,8 @@ public class PaperManager : MonoBehaviour
     void Start()
     {
         // Find the PaperRoller component
-        paperRoller = FindObjectOfType<PaperRoller>();
+        paperRoller = FindFirstObjectByType<PaperRoller>();
+
         if (paperRoller == null)
         {
             Debug.LogError("PaperRoller not found! Make sure it exists in the scene.");
@@ -39,7 +40,8 @@ public class PaperManager : MonoBehaviour
         {
             playerCamera = Camera.main;
             if (playerCamera == null)
-                playerCamera = FindObjectOfType<Camera>();
+                playerCamera = Camera.main ?? FindFirstObjectByType<Camera>();
+
         }
 
         // Set initial spawn position based on roll position

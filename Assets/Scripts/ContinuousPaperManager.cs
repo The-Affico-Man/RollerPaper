@@ -1,8 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro; // Make sure you have this
+
 
 public class ContinuousPaperManager : MonoBehaviour
 {
+    [Header("UI")]
+    public TextMeshProUGUI paperLengthText;
+
     [Header("Paper Settings")]
     public GameObject longPaperPrefab; // A long paper tile model (e.g., 10 segments long)
     public Transform paperSpawnPoint; // Where new paper tiles spawn (at/above the toilet roll)
@@ -43,7 +48,19 @@ public class ContinuousPaperManager : MonoBehaviour
     {
         UpdatePaperSpawning();
         CullOffScreenTiles();
+        UpdatePaperLengthUI();
+
     }
+    void UpdatePaperLengthUI()
+    {
+        if (paperLengthText != null)
+        {
+            float totalLengthUnityUnits = GetTotalPaperLength();
+            float totalLengthMeters = totalLengthUnityUnits * 0.1f; // Convert to real meters
+            paperLengthText.text = $"Paper Pulled: {totalLengthMeters:F2} m";
+        }
+    }
+
 
     void SetupPaperClipping()
     {
