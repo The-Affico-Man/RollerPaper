@@ -291,16 +291,16 @@ MonoBehaviour:
   paperLengthText: {fileID: 1370794268}
   longPaperPrefab: {fileID: 1904588564842495157, guid: 06119aad0baf428469b1cce5790582c5, type: 3}
   paperSpawnPoint: {fileID: 1898106908}
-  paperTileLength: 7.15
+  paperTileLength: 14.3
   toiletPaperRoll: {fileID: 1903767908}
   hideDistance: 0.5
   paperLayer:
     serializedVersion: 2
-    m_Bits: 1
+    m_Bits: 128
   cullDistance: 5
   playerCamera: {fileID: 330585545}
-  maxActiveTiles: 4
-  spawnThreshold: 0
+  maxActiveTiles: 10
+  spawnThreshold: 0.5
 --- !u!1 &173561923
 GameObject:
   m_ObjectHideFlags: 0
@@ -1283,7 +1283,7 @@ Transform:
   m_GameObject: {fileID: 1219914086}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.13297296, y: -3.531, z: 1.4160235}
+  m_LocalPosition: {x: 14.13, y: -21.84, z: 1.4160235}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1672,13 +1672,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c7ddd6951a739c4c9e61be38ec998ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  interactableLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  maxSimultaneousTouches: 2
   catPawPrefab: {fileID: 3644975092617324742, guid: 018c2d4607c1fa9468b6331f278317a6, type: 3}
   meowClips:
   - {fileID: 8300000, guid: 2cec9de9d9296464d8c47ba1718a7a42, type: 3}
   - {fileID: 8300000, guid: 54275441784600740a7fe1318d6749ba, type: 3}
   - {fileID: 8300000, guid: 11f267384409cd041ac77299b83ea4c8, type: 3}
-  paperRollingClip: {fileID: 8300000, guid: e1c4e096a5a92fd4893ddce6a8806c0e, type: 3}
-  paperClingClip: {fileID: 0}
+  paperRollingClip: {fileID: 0}
+  paperClingClip: {fileID: 8300000, guid: e1c4e096a5a92fd4893ddce6a8806c0e, type: 3}
 --- !u!4 &1607488421
 Transform:
   m_ObjectHideFlags: 0
@@ -1939,7 +1943,7 @@ Transform:
   m_GameObject: {fileID: 1898106907}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.16, y: 9.59, z: 1.45}
+  m_LocalPosition: {x: 0.16, y: 17.3, z: 1.45}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1983,8 +1987,32 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rollerModel: {fileID: 1903767908}
   spinMultiplier: 7
-  shakeAmount: 0.05
-  shakeSpeed: 10
+  maxShakeAmount: 0.02
+  speedForMaxShake: 50
+  minShakeSpeed: 10
+  maxShakeSpeed: 80
+  returnSmoothness: 10
+--- !u!65 &1903767911
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1903767907}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 4.82, y: 5.55, z: 6}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2094394025
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2033,9 +2061,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4787828872471599080, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 5359716727905784553, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     - target: {fileID: 5987143824274806398, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
       propertyPath: m_Name
       value: PaperRoll (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 5987143824274806398, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 6264888144554713777, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
       propertyPath: m_CastShadows
@@ -2049,6 +2089,10 @@ PrefabInstance:
       propertyPath: m_CastShadows
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8551983647815929245, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
+      propertyPath: m_Layer
+      value: 7
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2059,6 +2103,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 5987143824274806398, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1903767910}
+    - targetCorrespondingSourceObject: {fileID: 5987143824274806398, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1903767911}
   m_SourcePrefab: {fileID: 100100000, guid: 98dbb13523efb674eb96c83a7220f981, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
