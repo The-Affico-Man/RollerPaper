@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public class SwipeController : MonoBehaviour
 {
     [Header("Input Settings")]
+    [Tooltip("How quickly the swipe input adapts. Lower is smoother, higher is more responsive.")]
+    [Range(1f, 30f)]
+    public float swipeSmoothingFactor = 15f;
     [Tooltip("Only touches that hit an object on this layer will be processed.")]
     public LayerMask interactableLayerMask;
     [Tooltip("The maximum number of fingers allowed to touch the screen at once.")]
@@ -13,11 +16,12 @@ public class SwipeController : MonoBehaviour
     [Header("Cat Paw Settings")]
     public GameObject catPawPrefab;
 
-    // --- All other variables are unchanged ---
-    #region Private Variables
     private GameControls controls;
-    private Vector2 swipeDelta;
-    public Vector2 SwipeDelta => swipeDelta;
+    private Vector2 rawSwipeDelta;
+    private Vector2 smoothedSwipeDelta;
+    public Vector2 SwipeDelta => smoothedSwipeDelta;
+    public int ActivePullingFingers { get; private set; }
+
     private Vector2 lastMousePosition;
     private float totalSwipeDistance = 0f;
     public float TotalSwipeDistance => totalSwipeDistance;
@@ -36,9 +40,7 @@ public class SwipeController : MonoBehaviour
     private float meowChancePerTouch = 0.3f;
     private float lastSwipeSpeed = 0f;
     public float GetSwipeSpeed() => Mathf.Abs(lastSwipeSpeed);
-    #endregion
 
-    #region Setup Methods
     private void Awake()
     {
         controls = new GameControls();
@@ -51,56 +53,21 @@ public class SwipeController : MonoBehaviour
         audioSource.volume = 0.1f;
         rollingAudioSource.volume = 3f;
     }
+
     private void OnEnable() { controls.Gameplay.Enable(); }
     private void OnDisable() { controls.Gameplay.Disable(); }
-    #endregion
 
     private void Update()
     {
         HandleTouchInput();
         HandleMouseInput();
-        lastSwipeSpeed = swipeDelta.y < 0f ? -swipeDelta.y / Time.deltaTime : 0f;
-        if (swipeDelta.y < 0f)
-        {
-            totalSwipeDistance += -swipeDelta.y;
-        }
+        smoothedSwipeDelta = Vector2.Lerp(smoothedSwipeDelta, rawSwipeDelta, Time.deltaTime * swipeSmoothingFactor);
+        lastSwipeSpeed = smoothedSwipeDelta.y < 0f ? -smoothedSwipeDelta.y / Time.deltaTime : 0f;
+        if (smoothedSwipeDelta.y < 0f) { totalSwipeDistance += -smoothedSwipeDelta.y; }
+        if (smoothedSwipeDelta.y < -0.1f) { ActivePullingFingers = GetActivePawCount(); }
+        else { ActivePullingFingers = 0; }
     }
 
-    private void OnTouchStart(int touchId, Vector2 position)
-    {
-        Ray ray = mainCamera.ScreenPointToRay(position);
-        if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return;
-
-        if (activePaws.Count + (isMouseDragging ? 1 : 0) >= maxSimultaneousTouches) return;
-        if (activePaws.ContainsKey(touchId)) return;
-
-        GameObject newPaw = CreateCatPaw(position);
-        if (newPaw != null)
-        {
-            activePaws[touchId] = newPaw;
-            lastTouchPositions[touchId] = position;
-            PlayMeowSound();
-            StartRollingSound();
-        }
-    }
-
-    private void OnMouseStart(Vector2 position)
-    {
-        Ray ray = mainCamera.ScreenPointToRay(position);
-        if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return;
-
-        if (activePaws.Count >= maxSimultaneousTouches) return;
-        if (isMouseDragging) return;
-
-        isMouseDragging = true;
-        mousePaw = CreateCatPaw(position);
-        lastMousePosition = position;
-        PlayMeowSound();
-        StartRollingSound();
-    }
-
-    // --- All other helper methods are unchanged ---
-    #region Unchanged Helper Methods
     private void HandleTouchInput()
     {
         if (Touchscreen.current == null) return;
@@ -124,32 +91,7 @@ public class SwipeController : MonoBehaviour
         foreach (var touchId in activePaws.Keys) { if (!currentlyActiveTouches.Contains(touchId)) { pawsToRemove.Add(touchId); } }
         foreach (var touchId in pawsToRemove) { OnTouchEnd(touchId); }
     }
-    private void OnTouchMove(int touchId, Vector2 position)
-    {
-        if (activePaws.TryGetValue(touchId, out GameObject paw) && paw != null)
-        {
-            MoveCatPawToScreenPosition(paw, position);
-            if (lastTouchPositions.TryGetValue(touchId, out Vector2 lastPos))
-            {
-                swipeDelta = position - lastPos;
-                lastTouchPositions[touchId] = position;
-            }
-        }
-    }
-    private void OnTouchEnd(int touchId)
-    {
-        if (activePaws.TryGetValue(touchId, out GameObject paw))
-        {
-            if (paw != null) { Destroy(paw); }
-            activePaws.Remove(touchId);
-            lastTouchPositions.Remove(touchId);
-        }
-        if (activePaws.Count == 0 && !isMouseDragging)
-        {
-            StopRollingSound();
-            swipeDelta = Vector2.zero;
-        }
-    }
+
     private void HandleMouseInput()
     {
 #if UNITY_EDITOR
@@ -158,44 +100,68 @@ public class SwipeController : MonoBehaviour
         else if (Mouse.current.leftButton.wasReleasedThisFrame && isMouseDragging) { OnMouseEnd(); }
 #endif
     }
-    private void OnMouseMove(Vector2 position)
+
+    private void OnTouchStart(int touchId, Vector2 position)
     {
-        if (mousePaw != null)
+        Ray ray = mainCamera.ScreenPointToRay(position);
+        if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return;
+        if (activePaws.Count + (isMouseDragging ? 1 : 0) >= maxSimultaneousTouches) return;
+        if (activePaws.ContainsKey(touchId)) return;
+        GameObject newPaw = CreateCatPaw(position);
+        if (newPaw != null) { activePaws[touchId] = newPaw; lastTouchPositions[touchId] = position; PlayMeowSound(); StartRollingSound(); }
+    }
+
+    private void OnTouchMove(int touchId, Vector2 position)
+    {
+        if (activePaws.TryGetValue(touchId, out GameObject paw) && paw != null)
         {
-            MoveCatPawToScreenPosition(mousePaw, position);
-            swipeDelta = position - lastMousePosition;
-            lastMousePosition = position;
+            MoveCatPawToScreenPosition(paw, position);
+            if (lastTouchPositions.TryGetValue(touchId, out Vector2 lastPos))
+            {
+                rawSwipeDelta = position - lastPos;
+                lastTouchPositions[touchId] = position;
+            }
         }
     }
+
+    private void OnTouchEnd(int touchId)
+    {
+        if (activePaws.TryGetValue(touchId, out GameObject paw)) { if (paw != null) { Destroy(paw); } activePaws.Remove(touchId); lastTouchPositions.Remove(touchId); }
+        if (activePaws.Count == 0 && !isMouseDragging) { StopRollingSound(); rawSwipeDelta = Vector2.zero; }
+    }
+
+    private void OnMouseStart(Vector2 position)
+    {
+        Ray ray = mainCamera.ScreenPointToRay(position);
+        if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return;
+        if (activePaws.Count >= maxSimultaneousTouches) return;
+        if (isMouseDragging) return;
+        isMouseDragging = true;
+        mousePaw = CreateCatPaw(position);
+        lastMousePosition = position;
+        PlayMeowSound();
+        StartRollingSound();
+    }
+
+    private void OnMouseMove(Vector2 position)
+    {
+        if (mousePaw != null) { MoveCatPawToScreenPosition(mousePaw, position); rawSwipeDelta = position - lastMousePosition; lastMousePosition = position; }
+    }
+
     private void OnMouseEnd()
     {
         isMouseDragging = false;
         if (mousePaw != null) { Destroy(mousePaw); mousePaw = null; }
         lastMousePosition = Vector2.zero;
-        swipeDelta = Vector2.zero;
+        rawSwipeDelta = Vector2.zero;
         if (activePaws.Count == 0) { StopRollingSound(); }
     }
-    private GameObject CreateCatPaw(Vector2 screenPosition)
-    {
-        if (catPawPrefab == null) return null;
-        GameObject newPaw = Instantiate(catPawPrefab);
-        newPaw.transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(-30f, 30f));
-        MoveCatPawToScreenPosition(newPaw, screenPosition);
-        return newPaw;
-    }
-    private void MoveCatPawToScreenPosition(GameObject paw, Vector2 screenPos)
-    {
-        if (paw == null || mainCamera == null) return;
-        Vector3 worldPos = mainCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 4.5f));
-        paw.transform.position = worldPos;
-    }
-    private void PlayMeowSound()
-    {
-        if (meowClips.Length > 0 && Random.value < meowChancePerTouch) { audioSource.PlayOneShot(meowClips[Random.Range(0, meowClips.Length)]); }
-    }
+
+    private GameObject CreateCatPaw(Vector2 screenPosition) { if (catPawPrefab == null) return null; GameObject newPaw = Instantiate(catPawPrefab); newPaw.transform.rotation = Quaternion.Euler(0f, 0f, Random.Range(-30f, 30f)); MoveCatPawToScreenPosition(newPaw, screenPosition); return newPaw; }
+    private void MoveCatPawToScreenPosition(GameObject paw, Vector2 screenPos) { if (paw == null || mainCamera == null) return; Vector3 worldPos = mainCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 4.5f)); paw.transform.position = worldPos; }
+    private void PlayMeowSound() { if (meowClips.Length > 0 && Random.value < meowChancePerTouch) { audioSource.PlayOneShot(meowClips[Random.Range(0, meowClips.Length)]); } }
     private void StartRollingSound() { if (!isRollingPlaying) { rollingAudioSource.Play(); isRollingPlaying = true; } }
     private void StopRollingSound() { if (isRollingPlaying) { rollingAudioSource.Stop(); isRollingPlaying = false; } }
     public float GetSwipeDeltaY() => SwipeDelta.y;
     public int GetActivePawCount() { return activePaws.Count + (isMouseDragging ? 1 : 0); }
-    #endregion
 }
