@@ -70,7 +70,7 @@ public class ContinuousPaperManager : MonoBehaviour
         if (paperLengthText != null && swipeController != null)
         {
             float totalLengthMeters = swipeController.TotalSwipeDistance * 0.0002f;
-            paperLengthText.text = $"Paper Pulled: {totalLengthMeters:F2} m";
+            paperLengthText.text = $"{totalLengthMeters:F2}";
         }
     }
 
