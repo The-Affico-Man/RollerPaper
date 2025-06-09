@@ -4,15 +4,17 @@ using System.Collections.Generic;
 
 public class SwipeController : MonoBehaviour
 {
-    // ... all of your other variables are unchanged ...
-    #region Unchanged Variables
     [Header("Input Settings")]
     [Tooltip("Only touches that hit an object on this layer will be processed.")]
     public LayerMask interactableLayerMask;
     [Tooltip("The maximum number of fingers allowed to touch the screen at once.")]
     public int maxSimultaneousTouches = 2;
+
     [Header("Cat Paw Settings")]
     public GameObject catPawPrefab;
+
+    // --- All other variables are unchanged ---
+    #region Private Variables
     private GameControls controls;
     private Vector2 swipeDelta;
     public Vector2 SwipeDelta => swipeDelta;
@@ -36,36 +38,7 @@ public class SwipeController : MonoBehaviour
     public float GetSwipeSpeed() => Mathf.Abs(lastSwipeSpeed);
     #endregion
 
-    // --- The OnTouchEnd method is the only part that changes ---
-
-    private void OnTouchEnd(int touchId)
-    {
-        if (activePaws.TryGetValue(touchId, out GameObject paw))
-        {
-            if (paw != null)
-            {
-                Destroy(paw);
-            }
-            activePaws.Remove(touchId);
-            lastTouchPositions.Remove(touchId);
-        }
-
-        // Check if this was the last active touch/drag.
-        if (activePaws.Count == 0 && !isMouseDragging)
-        {
-            StopRollingSound();
-
-            // --- THIS IS THE FIX ---
-            // When the last finger is lifted, reset the swipe delta to zero.
-            // This stops the roller from using stale data from the last flick.
-            swipeDelta = Vector2.zero;
-            // --- END OF FIX ---
-        }
-    }
-
-
-    // --- ALL OTHER METHODS ARE UNCHANGED ---
-    #region Unchanged Methods
+    #region Setup Methods
     private void Awake()
     {
         controls = new GameControls();
@@ -80,6 +53,7 @@ public class SwipeController : MonoBehaviour
     }
     private void OnEnable() { controls.Gameplay.Enable(); }
     private void OnDisable() { controls.Gameplay.Disable(); }
+    #endregion
 
     private void Update()
     {
@@ -125,6 +99,8 @@ public class SwipeController : MonoBehaviour
         StartRollingSound();
     }
 
+    // --- All other helper methods are unchanged ---
+    #region Unchanged Helper Methods
     private void HandleTouchInput()
     {
         if (Touchscreen.current == null) return;
@@ -148,7 +124,6 @@ public class SwipeController : MonoBehaviour
         foreach (var touchId in activePaws.Keys) { if (!currentlyActiveTouches.Contains(touchId)) { pawsToRemove.Add(touchId); } }
         foreach (var touchId in pawsToRemove) { OnTouchEnd(touchId); }
     }
-
     private void OnTouchMove(int touchId, Vector2 position)
     {
         if (activePaws.TryGetValue(touchId, out GameObject paw) && paw != null)
@@ -161,7 +136,20 @@ public class SwipeController : MonoBehaviour
             }
         }
     }
-
+    private void OnTouchEnd(int touchId)
+    {
+        if (activePaws.TryGetValue(touchId, out GameObject paw))
+        {
+            if (paw != null) { Destroy(paw); }
+            activePaws.Remove(touchId);
+            lastTouchPositions.Remove(touchId);
+        }
+        if (activePaws.Count == 0 && !isMouseDragging)
+        {
+            StopRollingSound();
+            swipeDelta = Vector2.zero;
+        }
+    }
     private void HandleMouseInput()
     {
 #if UNITY_EDITOR
@@ -170,7 +158,6 @@ public class SwipeController : MonoBehaviour
         else if (Mouse.current.leftButton.wasReleasedThisFrame && isMouseDragging) { OnMouseEnd(); }
 #endif
     }
-
     private void OnMouseMove(Vector2 position)
     {
         if (mousePaw != null)
@@ -180,7 +167,6 @@ public class SwipeController : MonoBehaviour
             lastMousePosition = position;
         }
     }
-
     private void OnMouseEnd()
     {
         isMouseDragging = false;
@@ -189,7 +175,6 @@ public class SwipeController : MonoBehaviour
         swipeDelta = Vector2.zero;
         if (activePaws.Count == 0) { StopRollingSound(); }
     }
-
     private GameObject CreateCatPaw(Vector2 screenPosition)
     {
         if (catPawPrefab == null) return null;
@@ -198,25 +183,19 @@ public class SwipeController : MonoBehaviour
         MoveCatPawToScreenPosition(newPaw, screenPosition);
         return newPaw;
     }
-
     private void MoveCatPawToScreenPosition(GameObject paw, Vector2 screenPos)
     {
         if (paw == null || mainCamera == null) return;
         Vector3 worldPos = mainCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 4.5f));
         paw.transform.position = worldPos;
     }
-
     private void PlayMeowSound()
     {
         if (meowClips.Length > 0 && Random.value < meowChancePerTouch) { audioSource.PlayOneShot(meowClips[Random.Range(0, meowClips.Length)]); }
     }
-
     private void StartRollingSound() { if (!isRollingPlaying) { rollingAudioSource.Play(); isRollingPlaying = true; } }
-
     private void StopRollingSound() { if (isRollingPlaying) { rollingAudioSource.Stop(); isRollingPlaying = false; } }
-
     public float GetSwipeDeltaY() => SwipeDelta.y;
-
     public int GetActivePawCount() { return activePaws.Count + (isMouseDragging ? 1 : 0); }
     #endregion
 }
