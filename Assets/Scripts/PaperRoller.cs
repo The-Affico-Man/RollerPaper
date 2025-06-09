@@ -14,21 +14,23 @@ public class PaperRoller : MonoBehaviour
     public Roller visualRoller;
 
     [Header("Movement Settings")]
-    public float pullSensitivity = 1.0f;
+    [Tooltip("The main sensitivity control. This needs to be a larger number now (e.g., 30) because it's based on normalized screen height, not raw pixels.")]
+    public float pullSensitivity = 30f;
+    [Tooltip("How much faster the paper pulls with a second finger. 1.5 means 50% faster.")]
     public float twoFingerBonus = 1.5f;
+    [Tooltip("An extra multiplier applied only when playing in the Unity Editor to make the mouse feel better.")]
+    public float editorMouseSensitivityBonus = 6.0f;
 
     [Header("Glide/Damping Settings")]
+    [Tooltip("How quickly the glide effect fades after letting go. Higher is faster.")]
     public float glideDamping = 5f;
 
-    // --- NEW POWER-UP CONTROLS ---
     [Header("Power-up Settings")]
     [Tooltip("The multiplier to apply to the speed (e.g., 2.0 for 2x speed).")]
     public float boostMultiplier = 2.0f;
     [Tooltip("How long the speed boost lasts in seconds.")]
     public float boostDuration = 5.0f;
-    // The 'speedMultiplier' variable will be controlled by the coroutine
     private float speedMultiplier = 1.0f;
-    // ----------------------------
 
     [Header("Power-up Feedback (Drag from Scene)")]
     public Image boostTimerBar;
@@ -37,14 +39,14 @@ public class PaperRoller : MonoBehaviour
     public AudioClip boostStartSound;
     public AudioClip boostEndSound;
     [Tooltip("(Optional) The screen-filling image of anime speed lines.")]
-    public Image speedLinesVFX; // New VFX reference
+    public Image speedLinesVFX;
     [Tooltip("How much the speed lines image shakes during the boost.")]
-    public float speedLinesShakeAmount = 15f; // New shake control
+    public float speedLinesShakeAmount = 15f;
 
     private AudioSource audioSource;
-    private Vector2 lastSwipeDelta;
+    private float lastPullAmount = 0;
     private bool isBoostActive = false;
-    private Vector3 initialSpeedLinesPosition; // To store the starting position for shaking
+    private Vector3 initialSpeedLinesPosition;
 
     void Start()
     {
@@ -55,7 +57,6 @@ public class PaperRoller : MonoBehaviour
         startYPosition = transform.position.y;
         WorldSpaceDistancePulled = 0f;
 
-        // Hide all feedback UI at the start
         if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(false);
         if (boostTimerText != null) boostTimerText.gameObject.SetActive(false);
         if (speedLinesVFX != null)
@@ -67,34 +68,38 @@ public class PaperRoller : MonoBehaviour
 
     void Update()
     {
-        // --- NEW: Shake the speed lines if the boost is active ---
         if (isBoostActive && speedLinesVFX != null)
         {
             float xShake = Random.Range(-1f, 1f) * speedLinesShakeAmount;
             float yShake = Random.Range(-1f, 1f) * speedLinesShakeAmount;
             speedLinesVFX.rectTransform.anchoredPosition = initialSpeedLinesPosition + new Vector3(xShake, yShake, 0);
         }
-        // --------------------------------------------------------
 
         if (swipeController == null) return;
-        Vector2 currentFrameSwipe;
+
+        float currentPullAmount;
 
         if (swipeController.GetActivePawCount() > 0)
         {
-            currentFrameSwipe = swipeController.SwipeDelta;
-            lastSwipeDelta = currentFrameSwipe;
+            currentPullAmount = swipeController.NormalizedPullAmount;
+            lastPullAmount = currentPullAmount;
         }
         else
         {
-            lastSwipeDelta = Vector2.Lerp(lastSwipeDelta, Vector2.zero, Time.deltaTime * glideDamping);
-            currentFrameSwipe = lastSwipeDelta;
+            lastPullAmount = Mathf.Lerp(lastPullAmount, 0f, Time.deltaTime * glideDamping);
+            currentPullAmount = lastPullAmount;
         }
 
-        if (currentFrameSwipe.y < 0)
+        if (currentPullAmount > 0.001f)
         {
-            float pullAmount = Mathf.Abs(currentFrameSwipe.y);
-            float fingerBonus = (swipeController.GetActivePawCount() > 1) ? twoFingerBonus : 1.0f;
-            float movementDistance = pullAmount * pullSensitivity * fingerBonus * speedMultiplier * Time.deltaTime;
+            float fingerBonus = (swipeController.ActivePullingFingers > 1) ? twoFingerBonus : 1.0f;
+
+            float finalSensitivity = pullSensitivity;
+#if UNITY_EDITOR
+            finalSensitivity *= editorMouseSensitivityBonus;
+#endif
+
+            float movementDistance = currentPullAmount * finalSensitivity * fingerBonus * speedMultiplier * Time.deltaTime;
 
             transform.position += Vector3.down * movementDistance;
 
@@ -102,7 +107,7 @@ public class PaperRoller : MonoBehaviour
             {
                 float spinAmount = movementDistance * 200f;
                 visualRoller.SpinRoller(spinAmount);
-                float shakeFactor = Mathf.Clamp01(pullAmount / 20f);
+                float shakeFactor = Mathf.Clamp01(currentPullAmount * 2f);
                 visualRoller.SetShake(shakeFactor);
             }
         }
@@ -114,35 +119,18 @@ public class PaperRoller : MonoBehaviour
         WorldSpaceDistancePulled = startYPosition - transform.position.y;
     }
 
-    /// <summary>
-    /// This is the public function your NEW UI button will call.
-    /// It uses the values set in the Inspector.
-    /// </summary>
-    public void ActivateSpeedBoost()
-    {
-        if (isBoostActive) return;
-        StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration));
-    }
-
-    // This private method can still be used by the debug button if needed
-    public void ActivateSpeedBoost(float multiplier, float duration)
-    {
-        if (isBoostActive) return;
-        StartCoroutine(SpeedBoostCoroutine(multiplier, duration));
-    }
+    public void ActivateSpeedBoost() { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration)); }
+    public void ActivateSpeedBoost(float multiplier, float duration) { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(multiplier, duration)); }
 
     private IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
     {
         isBoostActive = true;
-
-        // --- START FEEDBACK ---
         speedMultiplier = multiplier;
         if (audioSource != null && boostStartSound != null) audioSource.PlayOneShot(boostStartSound);
         if (boostParticles != null) boostParticles.Play();
         if (speedLinesVFX != null) speedLinesVFX.gameObject.SetActive(true);
         if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(true);
         if (boostTimerText != null) boostTimerText.gameObject.SetActive(true);
-        // ----------------------
 
         float timeLeft = duration;
         while (timeLeft > 0)
@@ -153,25 +141,23 @@ public class PaperRoller : MonoBehaviour
             yield return null;
         }
 
-        // --- END FEEDBACK ---
         speedMultiplier = 1.0f;
         isBoostActive = false;
         if (audioSource != null && boostEndSound != null) audioSource.PlayOneShot(boostEndSound);
         if (boostParticles != null) boostParticles.Stop();
         if (speedLinesVFX != null)
         {
-            speedLinesVFX.rectTransform.anchoredPosition = initialSpeedLinesPosition; // Reset position
+            speedLinesVFX.rectTransform.anchoredPosition = initialSpeedLinesPosition;
             speedLinesVFX.gameObject.SetActive(false);
         }
         if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(false);
         if (boostTimerText != null) boostTimerText.gameObject.SetActive(false);
-        // --------------------
     }
 
     public void ResetPosition()
     {
         transform.position = new Vector3(transform.position.x, startYPosition, transform.position.z);
-        lastSwipeDelta = Vector2.zero;
+        lastPullAmount = 0;
         WorldSpaceDistancePulled = 0f;
     }
 }

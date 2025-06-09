@@ -17,8 +17,8 @@ public class DebugUIManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI smoothingValueText;
 
     [Header("PaperRoller Settings")]
-    [SerializeField] private Slider pullSensitivitySlider; // Renamed for clarity
-    [SerializeField] private TextMeshProUGUI pullSensitivityValueText; // Renamed for clarity
+    [SerializeField] private Slider pullSensitivitySlider;
+    [SerializeField] private TextMeshProUGUI pullSensitivityValueText;
     [SerializeField] private Slider glideDampingSlider;
     [SerializeField] private TextMeshProUGUI glideDampingValueText;
     [SerializeField] private Slider twoFingerBonusSlider;
@@ -29,7 +29,6 @@ public class DebugUIManager : MonoBehaviour
     {
         if (swipeController == null) swipeController = FindFirstObjectByType<SwipeController>();
         if (paperRoller == null) paperRoller = FindFirstObjectByType<PaperRoller>();
-
         if (swipeController == null || paperRoller == null || debugPanel == null)
         {
             Debug.LogError("Debug UI Manager is missing critical references! Disabling.");
@@ -40,38 +39,37 @@ public class DebugUIManager : MonoBehaviour
         debugPanel.SetActive(false);
         debugToggleButton.onClick.AddListener(ToggleDebugPanel);
 
-        // Initialize all sliders with correct data
         InitializeSmoothingSlider();
-        InitializePullSensitivitySlider(); // Renamed for clarity
+        InitializePullSensitivitySlider(); // This method is now corrected
         InitializeGlideDampingSlider();
         InitializeTwoFingerBonusSlider();
 
         if (speedBoostButton != null)
         {
-            speedBoostButton.onClick.AddListener(() => {
-                paperRoller.ActivateSpeedBoost(2.0f, 5.0f);
-            });
+            speedBoostButton.onClick.AddListener(() => { paperRoller.ActivateSpeedBoost(); });
         }
     }
 
     private void InitializeSmoothingSlider()
     {
         smoothingSlider.minValue = 1f;
-        smoothingSlider.maxValue = 30f;
+        smoothingSlider.maxValue = 50f;
         smoothingSlider.value = swipeController.swipeSmoothingFactor;
         smoothingValueText.text = swipeController.swipeSmoothingFactor.ToString("F1");
         smoothingSlider.onValueChanged.AddListener(OnSmoothingSliderChanged);
     }
 
-    // This method now correctly controls "Pull Sensitivity"
+    // --- THIS IS THE CORRECTED METHOD ---
     private void InitializePullSensitivitySlider()
     {
-        pullSensitivitySlider.minValue = 0.5f;
-        pullSensitivitySlider.maxValue = 5f;
+        // Use the new, larger range for the normalized input system
+        pullSensitivitySlider.minValue = 10f;
+        pullSensitivitySlider.maxValue = 200f;
         pullSensitivitySlider.value = paperRoller.pullSensitivity;
         pullSensitivityValueText.text = paperRoller.pullSensitivity.ToString("F1");
         pullSensitivitySlider.onValueChanged.AddListener(OnPullSensitivitySliderChanged);
     }
+    // ------------------------------------
 
     private void InitializeGlideDampingSlider()
     {
@@ -91,35 +89,11 @@ public class DebugUIManager : MonoBehaviour
         twoFingerBonusSlider.onValueChanged.AddListener(OnTwoFingerBonusSliderChanged);
     }
 
-    public void ToggleDebugPanel()
-    {
-        debugPanel.SetActive(!debugPanel.activeSelf);
-    }
-
-    public void OnSmoothingSliderChanged(float value)
-    {
-        if (swipeController != null) swipeController.swipeSmoothingFactor = value;
-        if (smoothingValueText != null) smoothingValueText.text = value.ToString("F1");
-    }
-
-    // This method now correctly sets "Pull Sensitivity"
-    public void OnPullSensitivitySliderChanged(float value)
-    {
-        if (paperRoller != null) paperRoller.pullSensitivity = value;
-        if (pullSensitivityValueText != null) pullSensitivityValueText.text = value.ToString("F1");
-    }
-
-    public void OnGlideDampingSliderChanged(float value)
-    {
-        if (paperRoller != null) paperRoller.glideDamping = value;
-        if (glideDampingValueText != null) glideDampingValueText.text = value.ToString("F1");
-    }
-
-    public void OnTwoFingerBonusSliderChanged(float value)
-    {
-        if (paperRoller != null) paperRoller.twoFingerBonus = value;
-        if (twoFingerBonusValueText != null) twoFingerBonusValueText.text = value.ToString("F1");
-    }
+    public void ToggleDebugPanel() { debugPanel.SetActive(!debugPanel.activeSelf); }
+    public void OnSmoothingSliderChanged(float value) { if (swipeController != null) swipeController.swipeSmoothingFactor = value; if (smoothingValueText != null) smoothingValueText.text = value.ToString("F1"); }
+    public void OnPullSensitivitySliderChanged(float value) { if (paperRoller != null) paperRoller.pullSensitivity = value; if (pullSensitivityValueText != null) pullSensitivityValueText.text = value.ToString("F1"); }
+    public void OnGlideDampingSliderChanged(float value) { if (paperRoller != null) paperRoller.glideDamping = value; if (glideDampingValueText != null) glideDampingValueText.text = value.ToString("F1"); }
+    public void OnTwoFingerBonusSliderChanged(float value) { if (paperRoller != null) paperRoller.twoFingerBonus = value; if (twoFingerBonusValueText != null) twoFingerBonusValueText.text = value.ToString("F1"); }
 
     private void OnDestroy()
     {
