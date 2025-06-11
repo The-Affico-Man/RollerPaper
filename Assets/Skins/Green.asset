@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d9a62eef2e395e439fbd01af320f050, type: 3}
-  m_Name: Siamese
+  m_Name: Green
   m_EditorClassIdentifier: 
-  skinName: Siamese
-  pawSprite: {fileID: 1154379024, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}
+  skinName: Green
+  pawSprite: {fileID: 1621003899, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}

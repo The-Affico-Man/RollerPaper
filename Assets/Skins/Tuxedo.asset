@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Tuxedo
   m_EditorClassIdentifier: 
   skinName: Tuxedo
-  pawSprite: {fileID: 876895931, guid: a74f0c0a227c04e4089a965074bb3e58, type: 3}
+  pawSprite: {fileID: 1112873789, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}
