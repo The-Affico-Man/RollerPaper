@@ -1,0 +1,17 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
+  m_Name: Gold
+  m_EditorClassIdentifier: 
+  skinName: Gold
+  rollMaterial: {fileID: 2100000, guid: 4960d60256b4a924e8ec690c70c25c9e, type: 2}
+  tileMaterial: {fileID: 2100000, guid: dc8a6ddfbb8d96043a23b97244a6d57d, type: 2}

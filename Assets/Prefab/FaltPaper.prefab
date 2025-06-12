@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 248140235952028877}
   - component: {fileID: 5470979525430516549}
   - component: {fileID: 5077196357640741864}
+  - component: {fileID: 3965915724455142554}
   m_Layer: 7
   m_Name: FaltPaper
   m_TagString: Untagged
@@ -125,6 +126,21 @@ Cloth:
   - {x: 0.6666667, y: 0.16666667, z: 0.16666667}
   - {x: 0.5, y: 0.5, z: 0}
   m_VirtualParticleIndices: 
+--- !u!114 &3965915724455142554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1904588564842495157}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3a1fb9847a3b8647aa80b4a01334185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  skinnedMeshRenderersToColor:
+  - {fileID: 9121653371011177901}
+  - {fileID: 1841197257411270381}
 --- !u!1 &3695482125575995169
 GameObject:
   m_ObjectHideFlags: 0

@@ -80,6 +80,20 @@ public class ContinuousPaperManager : MonoBehaviour
         Vector3 spawnPos = topTile.transform.position + Vector3.up * paperTileLength;
         GameObject newTile = Instantiate(longPaperPrefab, spawnPos, Quaternion.identity);
         newTile.transform.SetParent(this.transform, true);
+        PaperTile tileComponent = newTile.GetComponent<PaperTile>();
+        if (tileComponent != null && PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null)
+        {
+            tileComponent.SetSkin(PaperSkinManager.Instance.CurrentSkin.tileMaterial);
+        }
+        if (PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null)
+        {
+            Material tileMat = PaperSkinManager.Instance.CurrentSkin.tileMaterial;
+            MeshRenderer tileRenderer = newTile.GetComponent<MeshRenderer>();
+            if (tileMat != null && tileRenderer != null)
+            {
+                tileRenderer.material = tileMat;
+            }
+        }
         SetLayerRecursively(newTile, Mathf.RoundToInt(Mathf.Log(paperLayer.value, 2)));
         activePaperTiles.Insert(0, newTile);
     }
@@ -90,6 +104,11 @@ public class ContinuousPaperManager : MonoBehaviour
         GameObject firstTile = Instantiate(longPaperPrefab, paperSpawnPoint.position, Quaternion.identity);
         firstTile.transform.SetParent(this.transform, true);
         activePaperTiles.Add(firstTile);
+        PaperTile firstTileComponent = firstTile.GetComponent<PaperTile>();
+        if (firstTileComponent != null && PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null)
+        {
+            firstTileComponent.SetSkin(PaperSkinManager.Instance.CurrentSkin.tileMaterial);
+        }
         SetLayerRecursively(firstTile, Mathf.RoundToInt(Mathf.Log(paperLayer.value, 2)));
         for (int i = 0; i < 3; i++)
         {
