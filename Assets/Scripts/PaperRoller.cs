@@ -160,4 +160,5 @@ public class PaperRoller : MonoBehaviour
         lastPullAmount = 0;
         WorldSpaceDistancePulled = 0f;
     }
+
 }

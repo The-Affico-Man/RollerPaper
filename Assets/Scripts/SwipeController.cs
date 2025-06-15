@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
 
 public class SwipeController : MonoBehaviour
 {
@@ -88,6 +89,10 @@ public class SwipeController : MonoBehaviour
 
     private void OnTouchStart(int touchId, Vector2 position)
     {
+        if (EventSystem.current.IsPointerOverGameObject(touchId))
+        {
+            return;
+        }
         Ray ray = mainCamera.ScreenPointToRay(position);
         if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return;
         if (activePaws.Count + (isMouseDragging ? 1 : 0) >= maxSimultaneousTouches) return;
@@ -135,7 +140,13 @@ public class SwipeController : MonoBehaviour
         if (Mouse.current.leftButton.wasPressedThisFrame) { OnMouseStart(Mouse.current.position.ReadValue()); } else if (Mouse.current.leftButton.isPressed && isMouseDragging) { OnMouseMove(Mouse.current.position.ReadValue()); } else if (Mouse.current.leftButton.wasReleasedThisFrame && isMouseDragging) { OnMouseEnd(); }
 #endif
     }
-    private void OnMouseStart(Vector2 position) { Ray ray = mainCamera.ScreenPointToRay(position); if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return; if (activePaws.Count >= maxSimultaneousTouches) return; if (isMouseDragging) return; isMouseDragging = true; mousePaw = CreateCatPaw(position); lastMousePosition = position; PlayMeowSound(); StartRollingSound(); }
+    private void OnMouseStart(Vector2 position)
+    {
+        if (EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+        Ray ray = mainCamera.ScreenPointToRay(position); if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return; if (activePaws.Count >= maxSimultaneousTouches) return; if (isMouseDragging) return; isMouseDragging = true; mousePaw = CreateCatPaw(position); lastMousePosition = position; PlayMeowSound(); StartRollingSound(); }
     private void OnMouseMove(Vector2 position) { if (mousePaw != null) { MoveCatPawToScreenPosition(mousePaw, position); rawSwipeDelta = position - lastMousePosition; lastMousePosition = position; } }
     private void OnMouseEnd() { isMouseDragging = false; if (mousePaw != null) { Destroy(mousePaw); mousePaw = null; } lastMousePosition = Vector2.zero; rawSwipeDelta = Vector2.zero; if (activePaws.Count == 0) { StopRollingSound(); } }
     private void MoveCatPawToScreenPosition(GameObject paw, Vector2 screenPos) { if (paw == null || mainCamera == null) return; Vector3 worldPos = mainCamera.ScreenToWorldPoint(new Vector3(screenPos.x, screenPos.y, 4.5f)); paw.transform.position = worldPos; }
