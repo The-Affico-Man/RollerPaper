@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cead9a65a0b2e9b44b07d44b1001f84b, type: 3}
-  m_Name: A Car
+  m_Name: Mount Everest
   m_EditorClassIdentifier: 
-  milestoneName: a Car
-  distanceInMeters: 4.6
-  milestoneIcon: {fileID: -2117192711, guid: d9c29c10bcd838540b60f9cc6ec7668d, type: 3}
-  measurementType: 0
+  milestoneName: Mount Everest
+  distanceInMeters: 8848.86
+  milestoneIcon: {fileID: -1853498424, guid: d9c29c10bcd838540b60f9cc6ec7668d, type: 3}
+  measurementType: 1

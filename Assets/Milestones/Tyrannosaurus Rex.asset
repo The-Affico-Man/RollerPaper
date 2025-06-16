@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cead9a65a0b2e9b44b07d44b1001f84b, type: 3}
   m_Name: Tyrannosaurus Rex
   m_EditorClassIdentifier: 
-  milestoneName: Tyrannosaurus Rex
+  milestoneName: a Tyrannosaurus Rex
   distanceInMeters: 12.3
   milestoneIcon: {fileID: 1441475986, guid: d9c29c10bcd838540b60f9cc6ec7668d, type: 3}
   measurementType: 0

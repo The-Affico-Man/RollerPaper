@@ -123,7 +123,7 @@ public class MilestoneUIManager : MonoBehaviour
             if (MilestoneManager.Instance.IsMilestoneUnlocked(milestone))
             {
                 string measurementWord = (milestone.measurementType == MilestoneType.Height) ? "Height" : "Length";
-                nameText.text = $"You reached the {measurementWord} of\n<b>{milestone.milestoneName}</b>";
+                nameText.text = $"Your paper reached the {measurementWord} of\n<b>{milestone.milestoneName}</b>";
                 icon.color = Color.white;
             }
             else

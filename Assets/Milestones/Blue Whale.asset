@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cead9a65a0b2e9b44b07d44b1001f84b, type: 3}
   m_Name: Blue Whale
   m_EditorClassIdentifier: 
-  milestoneName: Blue Whale
+  milestoneName: a Blue Whale
   distanceInMeters: 29.9
   milestoneIcon: {fileID: -966826734, guid: d9c29c10bcd838540b60f9cc6ec7668d, type: 3}
   measurementType: 0
