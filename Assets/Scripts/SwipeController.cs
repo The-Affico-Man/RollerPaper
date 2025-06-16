@@ -89,9 +89,9 @@ public class SwipeController : MonoBehaviour
 
     private void OnTouchStart(int touchId, Vector2 position)
     {
-        if (EventSystem.current.IsPointerOverGameObject(touchId))
+        if (UIStateManager.Instance != null && UIStateManager.Instance.IsUIBlockingGameplay)
         {
-            return;
+            return; // If UI is open, ignore this gameplay touch.
         }
         Ray ray = mainCamera.ScreenPointToRay(position);
         if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return;
@@ -142,9 +142,9 @@ public class SwipeController : MonoBehaviour
     }
     private void OnMouseStart(Vector2 position)
     {
-        if (EventSystem.current.IsPointerOverGameObject())
+        if (UIStateManager.Instance != null && UIStateManager.Instance.IsUIBlockingGameplay)
         {
-            return;
+            return; // If UI is open, ignore this gameplay touch.
         }
         Ray ray = mainCamera.ScreenPointToRay(position); if (!Physics.Raycast(ray, 100f, interactableLayerMask)) return; if (activePaws.Count >= maxSimultaneousTouches) return; if (isMouseDragging) return; isMouseDragging = true; mousePaw = CreateCatPaw(position); lastMousePosition = position; PlayMeowSound(); StartRollingSound(); }
     private void OnMouseMove(Vector2 position) { if (mousePaw != null) { MoveCatPawToScreenPosition(mousePaw, position); rawSwipeDelta = position - lastMousePosition; lastMousePosition = position; } }

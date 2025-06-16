@@ -23,12 +23,19 @@ public class MilestoneManager : MonoBehaviour
             Instance = this;
         }
 
-        // Initialize the set, but do not reset progress here.
         unlockedMilestones = new HashSet<Milestone>();
 
         if (allMilestones != null)
         {
-            SortedMilestones = allMilestones.OrderBy(m => m.distanceInMeters).ToList();
+            // This robustly filters out any null entries and sorts the list.
+            SortedMilestones = allMilestones
+                .Where(m => m != null)
+                .OrderBy(m => m.distanceInMeters)
+                .ToList();
+        }
+        else
+        {
+            SortedMilestones = new List<Milestone>();
         }
     }
 
@@ -45,12 +52,11 @@ public class MilestoneManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// A public method that other managers can call to reset progress for a new game.
-    /// </summary>
     public void ResetProgress()
     {
-        unlockedMilestones.Clear();
-        Debug.Log("Milestone progress reset for this session.");
+        if (unlockedMilestones != null)
+        {
+            unlockedMilestones.Clear();
+        }
     }
 }

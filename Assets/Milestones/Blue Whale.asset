@@ -10,8 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cead9a65a0b2e9b44b07d44b1001f84b, type: 3}
-  m_Name: Bench
+  m_Name: Blue Whale
   m_EditorClassIdentifier: 
-  milestoneName: Bench
-  distanceInMeters: 1
-  milestoneIcon: {fileID: -383231531, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}
+  milestoneName: Blue Whale
+  distanceInMeters: 29.9
+  milestoneIcon: {fileID: -966826734, guid: d9c29c10bcd838540b60f9cc6ec7668d, type: 3}
+  measurementType: 0
