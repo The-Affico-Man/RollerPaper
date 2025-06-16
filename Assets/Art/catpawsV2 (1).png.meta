@@ -136,191 +136,15 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Grey
+      name: Zebra
       rect:
         serializedVersion: 2
-        x: 102
-        y: 1116
-        width: 180
-        height: 369
+        x: 900
+        y: 1105
+        width: 183
+        height: 398
       alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ef73bb101a86b7643a449738bf1dbd49
-      internalID: 335286947
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: White
-      rect:
-        serializedVersion: 2
-        x: 344
-        y: 1120
-        width: 175
-        height: 365
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 1e7bb947818bcaa4c9fe6a1523326141
-      internalID: -1213876933
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Black
-      rect:
-        serializedVersion: 2
-        x: 580
-        y: 1116
-        width: 182
-        height: 372
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: c3001d58d727a5b4fb52f2ca2331c934
-      internalID: 1593280424
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Orange
-      rect:
-        serializedVersion: 2
-        x: 808
-        y: 1116
-        width: 182
-        height: 370
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: 7b565105623d8fe46bc13a3fe1be5add
-      internalID: 1195474093
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Blue
-      rect:
-        serializedVersion: 2
-        x: 1086
-        y: 1116
-        width: 180
-        height: 372
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a257bf09ddc488f47a428916ab16b38c
-      internalID: 221476990
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Pink
-      rect:
-        serializedVersion: 2
-        x: 1329
-        y: 1122
-        width: 174
-        height: 363
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: a16866342dc1d7a49be3cd64fcc2bad4
-      internalID: 1066982058
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Red
-      rect:
-        serializedVersion: 2
-        x: 1566
-        y: 1121
-        width: 180
-        height: 366
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: d4df1f040aea75a468a460b9d8906a97
-      internalID: 1651749786
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Yellow
-      rect:
-        serializedVersion: 2
-        x: 1791
-        y: 1117
-        width: 179
-        height: 368
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: ed64326db34cb4248965156fe0739edb
-      internalID: 679615171
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: catpawsV2 (1)_8
-      rect:
-        serializedVersion: 2
-        x: 1855
-        y: 1116
-        width: 5
-        height: 6
-      alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -334,45 +158,221 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: catpawsV2 (1)_9
+      name: Galaxy
       rect:
         serializedVersion: 2
-        x: 1925
-        y: 1116
-        width: 13
-        height: 6
+        x: 659
+        y: 1103
+        width: 186
+        height: 386
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ebd32f130c87f9d40bcbd4c99a657806
-      internalID: -386768721
+      spriteID: c9c3364fad6857e40b27551ab7305104
+      internalID: -44239155
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Cream
+      name: Grey
       rect:
         serializedVersion: 2
-        x: 102
-        y: 655
-        width: 181
-        height: 376
+        x: 1125
+        y: 1115
+        width: 184
+        height: 374
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 052c8e1f51c849c459b24d76de13d33a
-      internalID: 369114537
+      spriteID: 225784e3a008ee744b53bb846e220f36
+      internalID: 335286947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: White
+      rect:
+        serializedVersion: 2
+        x: 1363
+        y: 1117
+        width: 186
+        height: 372
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b183a48c0cc740c43ac474ca0c2b24f2
+      internalID: -1213876933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Black
+      rect:
+        serializedVersion: 2
+        x: 1603
+        y: 1117
+        width: 186
+        height: 372
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cb159c6f8b03e3a43b1d913a96d00fb1
+      internalID: 1593280424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orange
+      rect:
+        serializedVersion: 2
+        x: 1831
+        y: 1115
+        width: 182
+        height: 374
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 835615d826fbba94e89f157e5d0da5c2
+      internalID: 1195474093
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Blue
+      rect:
+        serializedVersion: 2
+        x: 2107
+        y: 1115
+        width: 186
+        height: 374
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 853ff18f2a2ac2841873f17b63e746f1
+      internalID: 221476990
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pink
+      rect:
+        serializedVersion: 2
+        x: 2351
+        y: 1115
+        width: 178
+        height: 372
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4679dfffb7254f74590cfc4ce4ed4a81
+      internalID: 1066982058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Red
+      rect:
+        serializedVersion: 2
+        x: 2579
+        y: 1119
+        width: 192
+        height: 370
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ce885ea8cd2cc81449eebaf855c7c535
+      internalID: 1651749786
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Yellow
+      rect:
+        serializedVersion: 2
+        x: 2807
+        y: 1119
+        width: 190
+        height: 370
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca19c6764796b1e41924afe06a751c19
+      internalID: 679615171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Rainbow
+      rect:
+        serializedVersion: 2
+        x: 3049
+        y: 1109
+        width: 192
+        height: 380
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b560d4d9543cba4dbe32a4ccdac1cc3
+      internalID: 1558626733
       vertices: []
       indices: 
       edges: []
@@ -381,20 +381,152 @@ TextureImporter:
       name: Tuxedo
       rect:
         serializedVersion: 2
-        x: 339
-        y: 654
-        width: 186
-        height: 378
+        x: 3293
+        y: 1103
+        width: 180
+        height: 385
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 162e4c77b8b9ed644896c8bdf180d413
+      spriteID: 6dd8fc0460e92c043bddacdeef01b0b1
       internalID: 1112873789
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Orange Tuxedo
+      rect:
+        serializedVersion: 2
+        x: 3527
+        y: 1111
+        width: 186
+        height: 370
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a04fe41f99d87946988dd44565fda21
+      internalID: -1405904900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Tiger
+      rect:
+        serializedVersion: 2
+        x: 3755
+        y: 1103
+        width: 182
+        height: 380
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 67ac324d2196bf74d84a8f8de158a14b
+      internalID: 913063971
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Scales
+      rect:
+        serializedVersion: 2
+        x: 663
+        y: 635
+        width: 189
+        height: 396
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c0b2390480a38540b12b0dd6846ea4e
+      internalID: 1942464120
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Floral
+      rect:
+        serializedVersion: 2
+        x: 899
+        y: 635
+        width: 193
+        height: 398
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61041959299d19347984ace004567adc
+      internalID: 360071887
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cream
+      rect:
+        serializedVersion: 2
+        x: 1123
+        y: 653
+        width: 186
+        height: 380
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a9eb8cd85e0f024bb0a6fa50406fc18
+      internalID: 369114537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Reversed Tuxedo
+      rect:
+        serializedVersion: 2
+        x: 1355
+        y: 647
+        width: 205
+        height: 390
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6ca2ef23e8f0934db35886ef270b25c
+      internalID: -535674657
       vertices: []
       indices: 
       edges: []
@@ -403,19 +535,19 @@ TextureImporter:
       name: Tabby
       rect:
         serializedVersion: 2
-        x: 580
-        y: 655
-        width: 188
-        height: 378
+        x: 1601
+        y: 653
+        width: 200
+        height: 392
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fe689720994cd4149ae2d304be4edc1d
+      spriteID: 1ce127e3c172e704582389c4cf571c02
       internalID: -1682034444
       vertices: []
       indices: 
@@ -425,19 +557,19 @@ TextureImporter:
       name: Spotted Brown
       rect:
         serializedVersion: 2
-        x: 804
-        y: 655
-        width: 185
-        height: 377
+        x: 1823
+        y: 653
+        width: 194
+        height: 384
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 10438512e9dc4d6438423546ed1c3bd1
+      spriteID: f8fde70461d023a41b6e67f484a25969
       internalID: 1352631994
       vertices: []
       indices: 
@@ -447,19 +579,19 @@ TextureImporter:
       name: Green
       rect:
         serializedVersion: 2
-        x: 1080
-        y: 654
-        width: 186
-        height: 378
+        x: 2099
+        y: 647
+        width: 194
+        height: 398
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f6c8828061c0a794583be80ff5684977
+      spriteID: f6950ccc4ad86664888459eb8111d897
       internalID: 1621003899
       vertices: []
       indices: 
@@ -469,64 +601,152 @@ TextureImporter:
       name: Gold
       rect:
         serializedVersion: 2
-        x: 1325
-        y: 654
-        width: 181
-        height: 380
+        x: 2340
+        y: 653
+        width: 193
+        height: 382
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 1e5670bf0df78674f9507f076cf4340a
+      spriteID: 40f6fa022bf74674ab77dcfaa888bcd4
       internalID: -1772278392
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Levender
+      name: Lavender
       rect:
         serializedVersion: 2
-        x: 1564
-        y: 654
-        width: 182
-        height: 384
+        x: 2579
+        y: 655
+        width: 194
+        height: 378
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 0ff0cf6555e878a49ace076b7d8d9eaf
-      internalID: -1621733953
+      spriteID: 4b98395cd82bdce4db41c0c91e423292
+      internalID: -1275922327
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Burmese
+      name: Brown
       rect:
         serializedVersion: 2
-        x: 1790
-        y: 656
-        width: 182
-        height: 382
+        x: 2807
+        y: 653
+        width: 194
+        height: 391
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 89b478aab46d7e5449bffcf8ff518294
-      internalID: 1550270232
+      spriteID: c098e62d73b71de4e85fd2963d278fa8
+      internalID: -2051590895
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Leopard
+      rect:
+        serializedVersion: 2
+        x: 3047
+        y: 649
+        width: 186
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a4842b5859991bc4a9d187904890ee4a
+      internalID: -261777735
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Snow Leopard
+      rect:
+        serializedVersion: 2
+        x: 3291
+        y: 649
+        width: 182
+        height: 380
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9077fdf078972ea46ad7b99c3ee4ce7b
+      internalID: -1566750305
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Cheetah
+      rect:
+        serializedVersion: 2
+        x: 3527
+        y: 647
+        width: 186
+        height: 386
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a908a71cabe9527478f69917ce213549
+      internalID: 1541404143
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Pastel
+      rect:
+        serializedVersion: 2
+        x: 3767
+        y: 635
+        width: 186
+        height: 386
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29f627b116315164c9488b131f007e80
+      internalID: 314118662
       vertices: []
       indices: 
       edges: []
@@ -535,19 +755,19 @@ TextureImporter:
       name: Calico
       rect:
         serializedVersion: 2
-        x: 101
-        y: 170
-        width: 182
-        height: 402
+        x: 1116
+        y: 156
+        width: 193
+        height: 415
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: a5f71b5f5fba99343adba94e2b83545f
+      spriteID: e48491a81ba74434faba7961f3360a80
       internalID: -1265912182
       vertices: []
       indices: 
@@ -557,19 +777,19 @@ TextureImporter:
       name: Torbie
       rect:
         serializedVersion: 2
-        x: 336
-        y: 168
-        width: 188
-        height: 395
+        x: 1361
+        y: 155
+        width: 200
+        height: 410
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ef833ddfa4e1e6745b837de4a741251e
+      spriteID: cc2258d3a716c334aa248f251afffd83
       internalID: -1702847857
       vertices: []
       indices: 
@@ -579,19 +799,19 @@ TextureImporter:
       name: Siamese
       rect:
         serializedVersion: 2
-        x: 580
-        y: 168
-        width: 188
-        height: 394
+        x: 1601
+        y: 167
+        width: 192
+        height: 398
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 94313b97ad709a448900ae2df6185bb9
+      spriteID: 4e64edc95922c494ab4521612a258feb
       internalID: 1154379024
       vertices: []
       indices: 
@@ -601,19 +821,19 @@ TextureImporter:
       name: Bengal
       rect:
         serializedVersion: 2
-        x: 804
-        y: 168
-        width: 186
-        height: 396
+        x: 1824
+        y: 167
+        width: 193
+        height: 398
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 56940269d18fce444ba95cd1843cb700
+      spriteID: 8b50cb8b894fb5c4d8ce737a1a17e38e
       internalID: -342174832
       vertices: []
       indices: 
@@ -623,19 +843,19 @@ TextureImporter:
       name: Tonkinese
       rect:
         serializedVersion: 2
-        x: 1086
-        y: 182
-        width: 180
-        height: 391
+        x: 2107
+        y: 167
+        width: 186
+        height: 406
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7b24c41ef1b12c94a96b2c62de9dd27e
+      spriteID: e92b6c42b34f5234db29ff546f9bdadb
       internalID: -16908245
       vertices: []
       indices: 
@@ -645,19 +865,19 @@ TextureImporter:
       name: Grey Tabby
       rect:
         serializedVersion: 2
-        x: 1326
-        y: 180
-        width: 180
-        height: 390
+        x: 2347
+        y: 167
+        width: 186
+        height: 410
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ecd1ae6c69c6b2044884d7668610ccc3
+      spriteID: 190727c625d93b54daa8c605b460dd25
       internalID: -41038340
       vertices: []
       indices: 
@@ -667,42 +887,174 @@ TextureImporter:
       name: Tortoiseshell
       rect:
         serializedVersion: 2
-        x: 1560
-        y: 174
-        width: 186
-        height: 396
+        x: 2579
+        y: 167
+        width: 194
+        height: 410
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 370b13d831c886c499dbb30cc50d2d1e
+      spriteID: f7533c0a4ea282f49bc3e9f47a8d48d8
       internalID: -383231531
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Brown
+      name: Burmese
       rect:
         serializedVersion: 2
-        x: 1790
-        y: 180
-        width: 182
-        height: 388
+        x: 2807
+        y: 177
+        width: 194
+        height: 399
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3b7ec86d6a48b824aa5e2ca0afd5571e
-      internalID: -2051590895
+      spriteID: 061e6119dab83fb47a9e86da6746fc73
+      internalID: 1550270232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Purple
+      rect:
+        serializedVersion: 2
+        x: 3047
+        y: 187
+        width: 184
+        height: 378
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2e1b4754564b76341a2828db0124d429
+      internalID: -1226411238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Flame
+      rect:
+        serializedVersion: 2
+        x: 3531
+        y: 185
+        width: 190
+        height: 380
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0838048b91d8e964a97a825d02046651
+      internalID: -1380058125
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Charcoal
+      rect:
+        serializedVersion: 2
+        x: 3776
+        y: 189
+        width: 184
+        height: 384
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 28b90790d5617224993e20ae6de984f7
+      internalID: 1320122060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Abstract
+      rect:
+        serializedVersion: 2
+        x: 671
+        y: 155
+        width: 193
+        height: 398
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f4bedbdb9e6cc9442922255816785e07
+      internalID: 1716048465
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Patchwork
+      rect:
+        serializedVersion: 2
+        x: 895
+        y: 156
+        width: 186
+        height: 391
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cca89c297af49284c99f06e7396d3e0f
+      internalID: -1829065388
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Turquoise
+      rect:
+        serializedVersion: 2
+        x: 3287
+        y: 185
+        width: 194
+        height: 378
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72e0dc0a3156e8348983af3923433fe5
+      internalID: -811035998
       vertices: []
       indices: 
       edges: []
@@ -721,32 +1073,143 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
+      Abstract: 1716048465
       Bengal: -342174832
       Black: 1593280424
       Blue: 221476990
       Brown: -2051590895
       Burmese: 1550270232
       Calico: -1265912182
+      Charcoal: 1320122060
+      Cheetah: 1541404143
       Cream: 369114537
+      Flame: -1380058125
+      Floral: 360071887
+      Galaxy: -44239155
       Gold: -1772278392
       Green: 1621003899
       Grey: 335286947
       Grey Tabby: -41038340
-      Levender: -1621733953
+      Lavender: -1275922327
+      Leopard: -261777735
       Orange: 1195474093
+      Orange Tuxedo: -1405904900
+      Pastel: 314118662
+      Patchwork: -1829065388
       Pink: 1066982058
+      Purple: -1226411238
+      Rainbow: 1558626733
       Red: 1651749786
+      Reversed Tuxedo: -535674657
+      Scales: 1942464120
       Siamese: 1154379024
+      Snow Leopard: -1566750305
       Spotted Brown: 1352631994
       Tabby: -1682034444
+      Tiger: 913063971
       Tonkinese: -16908245
       Torbie: -1702847857
       Tortoiseshell: -383231531
+      Turquoise: -811035998
       Tuxedo: 1112873789
       White: -1213876933
       Yellow: 679615171
-      catpawsV2 (1)_8: 847311618
+      Zebra: 847311618
+      catpawsV2 (1)_0: -916402617
+      catpawsV2 (1)_1: -1732609713
+      catpawsV2 (1)_102: 1578340787
+      catpawsV2 (1)_104: -1312377219
+      catpawsV2 (1)_107: -1179504307
+      catpawsV2 (1)_112: -1133120353
+      catpawsV2 (1)_113: -508512746
+      catpawsV2 (1)_115: 505724704
+      catpawsV2 (1)_116: 1260168819
+      catpawsV2 (1)_117: 1517942259
+      catpawsV2 (1)_118: 542011042
+      catpawsV2 (1)_119: -1254295252
+      catpawsV2 (1)_120: 1369506509
+      catpawsV2 (1)_121: -1707919915
+      catpawsV2 (1)_122: 1376484722
+      catpawsV2 (1)_123: -1741995722
+      catpawsV2 (1)_124: 895615267
+      catpawsV2 (1)_125: 1728337522
+      catpawsV2 (1)_126: -595132731
+      catpawsV2 (1)_127: 406897898
+      catpawsV2 (1)_128: -1149334466
+      catpawsV2 (1)_129: 1269465422
+      catpawsV2 (1)_130: -607317495
+      catpawsV2 (1)_131: 1692266587
+      catpawsV2 (1)_132: 774045748
+      catpawsV2 (1)_133: 1441007551
+      catpawsV2 (1)_134: 1760331634
+      catpawsV2 (1)_135: 1441849297
+      catpawsV2 (1)_136: 222905413
+      catpawsV2 (1)_16: 1389245747
+      catpawsV2 (1)_19: -819380914
+      catpawsV2 (1)_2: 678142897
+      catpawsV2 (1)_22: -405618127
+      catpawsV2 (1)_25: -1036502521
+      catpawsV2 (1)_26: -1052138329
+      catpawsV2 (1)_27: -1305462044
+      catpawsV2 (1)_28: -1869871258
+      catpawsV2 (1)_29: -1358853566
+      catpawsV2 (1)_3: -2011811742
+      catpawsV2 (1)_30: 877951890
+      catpawsV2 (1)_31: 1901657530
+      catpawsV2 (1)_32: 633937639
+      catpawsV2 (1)_33: 1387068326
+      catpawsV2 (1)_34: -281807542
+      catpawsV2 (1)_35: -537037034
+      catpawsV2 (1)_36: 2048389860
+      catpawsV2 (1)_37: 1616082656
+      catpawsV2 (1)_38: -876485024
+      catpawsV2 (1)_39: -1714999313
+      catpawsV2 (1)_4: -914149646
+      catpawsV2 (1)_40: -259914000
+      catpawsV2 (1)_41: -483001287
+      catpawsV2 (1)_42: -1449317299
+      catpawsV2 (1)_43: -1861075686
+      catpawsV2 (1)_44: 683494949
+      catpawsV2 (1)_47: 196480798
+      catpawsV2 (1)_5: -1292125229
+      catpawsV2 (1)_52: -1639317551
+      catpawsV2 (1)_54: 1361517165
+      catpawsV2 (1)_56: 1158257269
+      catpawsV2 (1)_63: -1615267941
+      catpawsV2 (1)_64: 153120375
+      catpawsV2 (1)_65: -1676997656
+      catpawsV2 (1)_66: 2121774026
+      catpawsV2 (1)_67: -923476782
+      catpawsV2 (1)_68: -262428612
+      catpawsV2 (1)_69: 373124703
+      catpawsV2 (1)_7: -67381635
+      catpawsV2 (1)_70: 57704001
+      catpawsV2 (1)_71: 1580324410
+      catpawsV2 (1)_72: 862730316
+      catpawsV2 (1)_73: 1853222745
+      catpawsV2 (1)_74: -1423955724
+      catpawsV2 (1)_75: 1701346152
+      catpawsV2 (1)_76: -1756527671
+      catpawsV2 (1)_77: 702411391
+      catpawsV2 (1)_78: 2066309710
+      catpawsV2 (1)_79: 1648442704
+      catpawsV2 (1)_80: 1995751826
+      catpawsV2 (1)_81: -1568872999
+      catpawsV2 (1)_82: 2045257022
+      catpawsV2 (1)_83: -1528744162
+      catpawsV2 (1)_84: -1118891722
+      catpawsV2 (1)_85: -126830348
+      catpawsV2 (1)_86: 1163016430
+      catpawsV2 (1)_87: -1047302083
+      catpawsV2 (1)_88: 1052688559
+      catpawsV2 (1)_89: -304811125
       catpawsV2 (1)_9: -386768721
+      catpawsV2 (1)_90: 1787911023
+      catpawsV2 (1)_91: -723584052
+      catpawsV2 (1)_92: 842668659
+      catpawsV2 (1)_93: -1227892439
+      catpawsV2 (1)_94: 1820376221
+      catpawsV2 (1)_96: -411488813
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

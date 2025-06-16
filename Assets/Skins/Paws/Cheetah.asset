@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0d9a62eef2e395e439fbd01af320f050, type: 3}
-  m_Name: Lavender
+  m_Name: Cheetah
   m_EditorClassIdentifier: 
-  skinName: Lavender
-  pawSprite: {fileID: -1275922327, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}
+  skinName: Cheetah
+  pawSprite: {fileID: 1541404143, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}

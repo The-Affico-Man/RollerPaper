@@ -9,8 +9,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d9a62eef2e395e439fbd01af320f050, type: 3}
-  m_Name: Lavender
+  m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
+  m_Name: Silver
   m_EditorClassIdentifier: 
-  skinName: Lavender
-  pawSprite: {fileID: -1275922327, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}
+  skinName: Silver
+  rollMaterial: {fileID: 2100000, guid: 5513ff1b5627d1d4e999b7260f24ec84, type: 2}
+  tileMaterial: {fileID: 2100000, guid: b42106b1990e1de40a4820b0c161f67a, type: 2}
