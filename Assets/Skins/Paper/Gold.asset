@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
   m_Name: Gold
   m_EditorClassIdentifier: 
+  unlockType: 0
+  priceInCoins: 1
+  requiredMilestone: {fileID: 0}
+  requiredTotalDistance: 0
+  thumbnail: {fileID: 21300000, guid: afd63220918716b4899bd96109762816, type: 3}
   skinName: Gold
   rollMaterial: {fileID: 2100000, guid: 4960d60256b4a924e8ec690c70c25c9e, type: 2}
   tileMaterial: {fileID: 2100000, guid: dc8a6ddfbb8d96043a23b97244a6d57d, type: 2}

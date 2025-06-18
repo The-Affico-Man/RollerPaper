@@ -12,5 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d9a62eef2e395e439fbd01af320f050, type: 3}
   m_Name: Orange
   m_EditorClassIdentifier: 
+  unlockType: 0
+  priceInCoins: 1
+  requiredMilestone: {fileID: 0}
   skinName: Orange
   pawSprite: {fileID: 1195474093, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}
+  requiredTotalDistance: 0

@@ -1,7 +1,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System.Linq;
 
+[System.Serializable] // This makes it show up nicely in the Inspector
+public class RewardTier
+{
+    [Tooltip("This reward applies UP TO this distance in meters.")]
+    public float distanceThreshold;
+    [Tooltip("The number of coins to award per 'metersPerCoin' within this tier.")]
+    public int coinAmount;
+}
 public class ContinuousPaperManager : MonoBehaviour
 {
     [Header("UI")]
@@ -29,6 +38,15 @@ public class ContinuousPaperManager : MonoBehaviour
     public Camera playerCamera;
     public int maxActiveTiles = 15;
 
+
+    [Header("Tiered Coin Generation")]
+    [Tooltip("The distance interval for awarding coins (e.g., every 10 meters).")]
+    public float metersPerCoinInterval = 10f;
+    [Tooltip("Define the reward tiers. Make sure they are sorted by distance, from lowest to highest!")]
+    public List<RewardTier> rewardTiers;
+
+    private float lastMeterCheck = 0f;
+
     private List<GameObject> activePaperTiles = new List<GameObject>();
 
     void Start()
@@ -38,6 +56,10 @@ public class ContinuousPaperManager : MonoBehaviour
 
         playerCamera = Camera.main ?? FindFirstObjectByType<Camera>();
         SpawnInitialPaperTiles();
+        if (rewardTiers != null)
+        {
+            rewardTiers = rewardTiers.OrderBy(tier => tier.distanceThreshold).ToList();
+        }
     }
 
     void Update()
@@ -60,6 +82,36 @@ public class ContinuousPaperManager : MonoBehaviour
             float totalLengthMeters = worldDistance * conversionFactor;
 
             paperLengthText.text = $"{totalLengthMeters:F2}";
+            if (totalLengthMeters - lastMeterCheck >= metersPerCoinInterval)
+            {
+                // Find the correct reward tier based on the player's current total distance.
+                int coinReward = 0;
+                foreach (RewardTier tier in rewardTiers)
+                {
+                    // Find the first tier whose threshold is HIGHER than our last check point.
+                    if (lastMeterCheck < tier.distanceThreshold)
+                    {
+                        coinReward = tier.coinAmount;
+                        break; // Found the correct tier, stop searching.
+                    }
+                }
+
+                // If no tier was found (e.g., player exceeded all defined thresholds),
+                // use the reward from the very last defined tier.
+                if (coinReward == 0 && rewardTiers.Count > 0)
+                {
+                    coinReward = rewardTiers.Last().coinAmount;
+                }
+
+                // Award the coins if a valid reward was found.
+                if (coinReward > 0)
+                {
+                    CurrencyManager.Instance.AddCoins(coinReward);
+                }
+
+                // Update our tracker to the next interval.
+                lastMeterCheck += metersPerCoinInterval;
+            }
         }
     }
 

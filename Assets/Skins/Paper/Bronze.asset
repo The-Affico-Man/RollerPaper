@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
   m_Name: Bronze
   m_EditorClassIdentifier: 
+  unlockType: 0
+  priceInCoins: 1
+  requiredMilestone: {fileID: 0}
+  requiredTotalDistance: 0
+  thumbnail: {fileID: 21300000, guid: 9f4e83eb00299804eb4741079220d406, type: 3}
   skinName: Bronze
   rollMaterial: {fileID: 2100000, guid: 2ee4f4d1f0b7d2348b173ecaec03c4bd, type: 2}
   tileMaterial: {fileID: 2100000, guid: fc511e144070496429f88de20c0ad4ed, type: 2}

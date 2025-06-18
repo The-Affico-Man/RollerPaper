@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
   m_Name: Silver
   m_EditorClassIdentifier: 
+  unlockType: 0
+  priceInCoins: 1
+  requiredMilestone: {fileID: 0}
+  requiredTotalDistance: 0
+  thumbnail: {fileID: 21300000, guid: 88be1aa6df4e072459467aa1088464ec, type: 3}
   skinName: Silver
   rollMaterial: {fileID: 2100000, guid: 5513ff1b5627d1d4e999b7260f24ec84, type: 2}
   tileMaterial: {fileID: 2100000, guid: b42106b1990e1de40a4820b0c161f67a, type: 2}

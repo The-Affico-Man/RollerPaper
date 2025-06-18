@@ -12,6 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
   m_Name: MintGreen
   m_EditorClassIdentifier: 
+  unlockType: 0
+  priceInCoins: 1
+  requiredMilestone: {fileID: 0}
+  requiredTotalDistance: 0
+  thumbnail: {fileID: 21300000, guid: 26806b4299a4cd6409e948f2671d91e6, type: 3}
   skinName: Mint Green
   rollMaterial: {fileID: 2100000, guid: 5784c0f96e6a56e49a0faf19c889eee0, type: 2}
   tileMaterial: {fileID: 2100000, guid: c5d8dbd62826f1440bbabbeaf5552c4f, type: 2}

@@ -21,5 +21,8 @@ public class Milestone : ScriptableObject
     // --- THIS IS THE NEW PART ---
     [Tooltip("Is this milestone about length (like a whale) or height (like a tower)?")]
     public MilestoneType measurementType = MilestoneType.Length;
+
+    [Tooltip("How many coins the player receives for unlocking this milestone.")]
+    public int coinReward = 100;
     // ----------------------------
 }

@@ -12,7 +12,11 @@ public class SkinManager : MonoBehaviour
     public CatSkin CurrentSkin { get; private set; }
     public static SkinManager Instance { get; private set; }
 
-    private int currentSkinIndex = -1; // Keep track of our position in the list
+    private int currentSkinIndex = -1;
+
+    // --- THIS IS THE NEW LOGIC TO TRACK UNLOCKS ---
+    private HashSet<CatSkin> unlockedSkins;
+    // ---------------------------------------------
 
     private void Awake()
     {
@@ -24,26 +28,41 @@ public class SkinManager : MonoBehaviour
         {
             Instance = this;
         }
+
+        // Initialize the set when the game starts.
+        unlockedSkins = new HashSet<CatSkin>();
     }
 
     private void Start()
     {
+        // --- MODIFIED: Automatically unlock the default skin ---
         if (defaultSkin != null && availableSkins.Contains(defaultSkin))
         {
+            UnlockSkin(defaultSkin); // Ensure the default is always unlocked
             SetCurrentSkin(defaultSkin);
         }
         else if (availableSkins.Count > 0)
         {
+            UnlockSkin(availableSkins[0]); // Fallback to the first skin
             SetCurrentSkin(availableSkins[0]);
         }
         else
         {
             Debug.LogError("SkinManager has no available skins!");
         }
+        // ----------------------------------------------------
     }
 
     public void SetCurrentSkin(CatSkin newSkin)
     {
+        // --- MODIFIED: Check if the skin is unlocked before equipping ---
+        if (newSkin == null || !availableSkins.Contains(newSkin) || !IsSkinUnlocked(newSkin))
+        {
+            Debug.LogWarning($"Attempted to equip a locked or invalid cat skin: {newSkin?.name}");
+            return;
+        }
+        // ----------------------------------------------------------------
+
         int skinIndex = availableSkins.IndexOf(newSkin);
         if (skinIndex != -1)
         {
@@ -51,17 +70,35 @@ public class SkinManager : MonoBehaviour
             currentSkinIndex = skinIndex;
             Debug.Log($"Current cat skin set to: {CurrentSkin.skinName}");
         }
-        else
-        {
-            Debug.LogError($"Attempted to set a skin '{newSkin.name}' that is not in the availableSkins list!");
-        }
     }
 
-    // --- THIS IS THE NEW METHOD ---
+    // --- THIS IS THE NEW METHOD THE SHOP NEEDS ---
     /// <summary>
-    /// Cycles to the next skin in the 'availableSkins' list.
-    /// If it reaches the end, it loops back to the beginning.
+    /// Checks if a specific skin has been added to the unlocked set.
     /// </summary>
+    public bool IsSkinUnlocked(CatSkin skin)
+    {
+        return unlockedSkins != null && unlockedSkins.Contains(skin);
+    }
+    // ---------------------------------------------
+
+    // --- THIS IS THE NEW METHOD FOR THE SHOP TO CALL ---
+    /// <summary>
+    /// Adds a skin to the unlocked set. This would be called after a successful purchase.
+    /// </summary>
+    public void UnlockSkin(CatSkin skin)
+    {
+        if (skin != null && unlockedSkins != null && !unlockedSkins.Contains(skin))
+        {
+            unlockedSkins.Add(skin);
+            Debug.Log($"Cat skin unlocked: {skin.skinName}");
+        }
+    }
+    // --------------------------------------------------
+
+
+    // Your existing CycleToNextSkin method is unchanged and correct.
+    #region Unchanged Working Code
     public void CycleToNextSkin()
     {
         if (availableSkins == null || availableSkins.Count == 0)
@@ -70,15 +107,16 @@ public class SkinManager : MonoBehaviour
             return;
         }
 
-        // Increment the index, and if it goes past the end of the list, loop back to 0.
         currentSkinIndex++;
         if (currentSkinIndex >= availableSkins.Count)
         {
             currentSkinIndex = 0;
         }
 
-        // Set the new current skin based on the updated index.
+        // NOTE: This will still cycle through ALL skins, not just unlocked ones.
+        // This is fine for a debug menu, but for a player-facing feature,
+        // you would want to modify this to only cycle through the 'unlockedSkins' list.
         SetCurrentSkin(availableSkins[currentSkinIndex]);
     }
-    // ----------------------------
+    #endregion
 }

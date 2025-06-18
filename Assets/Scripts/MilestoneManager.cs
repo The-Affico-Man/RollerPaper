@@ -50,6 +50,10 @@ public class MilestoneManager : MonoBehaviour
         {
             unlockedMilestones.Add(milestone);
         }
+        if (milestone.coinReward > 0)
+        {
+            CurrencyManager.Instance.AddCoins(milestone.coinReward);
+        }
     }
 
     public void ResetProgress()

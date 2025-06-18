@@ -13,7 +13,11 @@ public class PaperSkinManager : MonoBehaviour
     public PaperSkin CurrentSkin { get; private set; }
     public static PaperSkinManager Instance { get; private set; }
 
-    private int currentSkinIndex = -1; // Keep track of our position in the list
+    private int currentSkinIndex = -1;
+
+    // --- THIS IS THE NEW LOGIC TO TRACK UNLOCKS ---
+    private HashSet<PaperSkin> unlockedSkins;
+    // ---------------------------------------------
 
     private void Awake()
     {
@@ -25,6 +29,9 @@ public class PaperSkinManager : MonoBehaviour
         {
             Instance = this;
         }
+
+        // Initialize the set when the game starts.
+        unlockedSkins = new HashSet<PaperSkin>();
     }
 
     private void Start()
@@ -34,26 +41,32 @@ public class PaperSkinManager : MonoBehaviour
             Debug.LogError("PaperSkinManager: The 'Paper Roll Mesh Renderer' has not been assigned!");
         }
 
+        // --- MODIFIED: Automatically unlock the default skin ---
         if (defaultSkin != null)
         {
+            UnlockSkin(defaultSkin); // Ensure the default is always unlocked
             SetCurrentSkin(defaultSkin);
         }
         else if (availableSkins.Count > 0)
         {
+            UnlockSkin(availableSkins[0]); // Fallback to the first skin
             SetCurrentSkin(availableSkins[0]);
         }
+        // ----------------------------------------------------
     }
 
     public void SetCurrentSkin(PaperSkin newSkin)
     {
-        if (newSkin == null || !availableSkins.Contains(newSkin))
+        // --- MODIFIED: Check if the skin is unlocked before equipping ---
+        if (newSkin == null || !availableSkins.Contains(newSkin) || !IsSkinUnlocked(newSkin))
         {
-            Debug.LogError("Attempted to set an invalid or unavailable paper skin.");
+            Debug.LogWarning($"Attempted to equip a locked or invalid paper skin: {newSkin?.name}");
             return;
         }
+        // ----------------------------------------------------------------
 
         CurrentSkin = newSkin;
-        currentSkinIndex = availableSkins.IndexOf(newSkin); // Update the index
+        currentSkinIndex = availableSkins.IndexOf(newSkin);
         Debug.Log($"Paper skin changed to: {CurrentSkin.skinName}");
 
         if (paperRollMeshRenderer != null && CurrentSkin.rollMaterial != null)
@@ -61,38 +74,56 @@ public class PaperSkinManager : MonoBehaviour
             paperRollMeshRenderer.material = CurrentSkin.rollMaterial;
         }
 
-        // When the skin changes, we need to update any existing paper tiles.
         UpdateExistingPaperTiles();
     }
 
-    // --- THIS IS THE NEW METHOD ---
+    // --- THIS IS THE NEW METHOD THE SHOP NEEDS ---
     /// <summary>
-    /// Cycles to the next skin in the 'availableSkins' list.
+    /// Checks if a specific skin has been added to the unlocked set.
     /// </summary>
+    public bool IsSkinUnlocked(PaperSkin skin)
+    {
+        return unlockedSkins != null && unlockedSkins.Contains(skin);
+    }
+    // ---------------------------------------------
+
+    // --- THIS IS THE NEW METHOD FOR THE SHOP TO CALL ---
+    /// <summary>
+    /// Adds a skin to the unlocked set. This would be called after a successful purchase.
+    /// </summary>
+    public void UnlockSkin(PaperSkin skin)
+    {
+        if (skin != null && unlockedSkins != null && !unlockedSkins.Contains(skin))
+        {
+            unlockedSkins.Add(skin);
+            Debug.Log($"Paper skin unlocked: {skin.skinName}");
+        }
+    }
+    // --------------------------------------------------
+
+    // Your existing CycleToNextSkin and UpdateExistingPaperTiles methods are unchanged.
+    #region Unchanged Working Code
     public void CycleToNextSkin()
     {
         if (availableSkins == null || availableSkins.Count == 0) return;
-
         currentSkinIndex++;
         if (currentSkinIndex >= availableSkins.Count)
         {
             currentSkinIndex = 0;
         }
-
+        // NOTE: This might need a change later to cycle only through UNLOCKED skins.
+        // For now, for the debug menu, it's fine.
         SetCurrentSkin(availableSkins[currentSkinIndex]);
     }
-    // ----------------------------
 
-    /// <summary>
-    /// Finds all active paper tiles and tells them to update their skin.
-    /// This is important for when the player changes skins mid-game.
-    /// </summary>
     private void UpdateExistingPaperTiles()
     {
+        if (CurrentSkin == null) return;
         PaperTile[] activeTiles = FindObjectsByType<PaperTile>(FindObjectsSortMode.None);
         foreach (PaperTile tile in activeTiles)
         {
             tile.SetSkin(CurrentSkin.tileMaterial);
         }
     }
+    #endregion
 }
