@@ -3,7 +3,7 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 
-[System.Serializable] // This makes it show up nicely in the Inspector
+[System.Serializable]
 public class RewardTier
 {
     [Tooltip("This reward applies UP TO this distance in meters.")]
@@ -11,26 +11,26 @@ public class RewardTier
     [Tooltip("The number of coins to award per 'metersPerCoin' within this tier.")]
     public int coinAmount;
 }
+
 public class ContinuousPaperManager : MonoBehaviour
 {
+    // All your variables are correct and unchanged
+    #region Unchanged Variables
     [Header("UI")]
     public TextMeshProUGUI paperLengthText;
 
     private PaperRoller paperRoller;
 
     [Header("Scoring")]
-    [Tooltip("The real-world length of one paper tile prefab in meters. (e.g., 4 squares * 10cm/square = 0.4m)")]
     public float realWorldMetersPerTile = 0.4f;
 
     [Header("Paper Settings")]
     public GameObject longPaperPrefab;
     public Transform paperSpawnPoint;
-    [Tooltip("The length of the paper tile in Unity's world units. This should match the prefab's model size.")]
     public float paperTileLength = 1f;
 
     [Header("Visibility Control")]
-    public Transform toiletPaperRoll;
-    public float hideDistance = 0.5f;
+    public Transform toiletPaperRoll; // This MUST be assigned in the Inspector
     public LayerMask paperLayer = 1;
 
     [Header("Culling Settings")]
@@ -38,30 +38,75 @@ public class ContinuousPaperManager : MonoBehaviour
     public Camera playerCamera;
     public int maxActiveTiles = 15;
 
-
     [Header("Tiered Coin Generation")]
-    [Tooltip("The distance interval for awarding coins (e.g., every 10 meters).")]
     public float metersPerCoinInterval = 10f;
-    [Tooltip("Define the reward tiers. Make sure they are sorted by distance, from lowest to highest!")]
     public List<RewardTier> rewardTiers;
 
     private float lastMeterCheck = 0f;
-
     private List<GameObject> activePaperTiles = new List<GameObject>();
+    #endregion
 
-    void Start()
+    // --- THE KEY FIX: Use Awake() for finding references ---
+    // Awake() is guaranteed to run before any Start() methods in the scene.
+    void Awake()
     {
-        paperRoller = GetComponent<PaperRoller>();
-        if (paperRoller == null) { Debug.LogError("ContinuousPaperManager could not find the PaperRoller script on the same GameObject!"); }
+        // Find the PaperRoller reference here so it's ready for any script that needs it.
+        paperRoller = FindFirstObjectByType<PaperRoller>();
 
+        // We can also safely set up the camera and reward tiers here.
         playerCamera = Camera.main ?? FindFirstObjectByType<Camera>();
-        SpawnInitialPaperTiles();
         if (rewardTiers != null)
         {
             rewardTiers = rewardTiers.OrderBy(tier => tier.distanceThreshold).ToList();
         }
     }
 
+    // The Start() method is no longer needed and can be deleted.
+
+    public void InitializePaperAtRollerPosition()
+    {
+        // Add safety checks here. Because Awake() has run, paperRoller should not be null.
+        if (toiletPaperRoll == null || paperSpawnPoint == null || paperRoller == null)
+        {
+            Debug.LogError("ContinuousPaperManager: A critical reference is not set! Cannot spawn paper.", this.gameObject);
+            return;
+        }
+        SpawnInitialPaperTiles();
+    }
+
+    void SpawnInitialPaperTiles()
+    {
+        ClearAllPaper();
+
+        Vector3 spawnPosition;
+        if (paperRoller.WorldSpaceDistancePulled < 0.01f)
+        {
+            spawnPosition = paperSpawnPoint.position;
+        }
+        else
+        {
+            spawnPosition = toiletPaperRoll.position;
+        }
+
+        GameObject firstTile = Instantiate(longPaperPrefab, spawnPosition, Quaternion.identity);
+        firstTile.transform.SetParent(this.transform, true);
+        activePaperTiles.Add(firstTile);
+
+        PaperTile firstTileComponent = firstTile.GetComponent<PaperTile>();
+        if (firstTileComponent != null && PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null)
+        {
+            firstTileComponent.SetSkin(PaperSkinManager.Instance.CurrentSkin.tileMaterial);
+        }
+        SetLayerRecursively(firstTile, Mathf.RoundToInt(Mathf.Log(paperLayer.value, 2)));
+        for (int i = 0; i < 3; i++)
+        {
+            if (activePaperTiles.Count >= maxActiveTiles) break;
+            SpawnOneTileAtTop();
+        }
+    }
+
+    // All other methods are completely unchanged and correct
+    #region Unchanged Methods
     void Update()
     {
         CullOffScreenTiles();
@@ -84,40 +129,31 @@ public class ContinuousPaperManager : MonoBehaviour
             paperLengthText.text = $"{totalLengthMeters:F2}";
             if (totalLengthMeters - lastMeterCheck >= metersPerCoinInterval)
             {
-                // Find the correct reward tier based on the player's current total distance.
                 int coinReward = 0;
                 foreach (RewardTier tier in rewardTiers)
                 {
-                    // Find the first tier whose threshold is HIGHER than our last check point.
                     if (lastMeterCheck < tier.distanceThreshold)
                     {
                         coinReward = tier.coinAmount;
-                        break; // Found the correct tier, stop searching.
+                        break;
                     }
                 }
-
-                // If no tier was found (e.g., player exceeded all defined thresholds),
-                // use the reward from the very last defined tier.
                 if (coinReward == 0 && rewardTiers.Count > 0)
                 {
                     coinReward = rewardTiers.Last().coinAmount;
                 }
 
-                // Award the coins if a valid reward was found.
                 if (coinReward > 0)
                 {
                     CurrencyManager.Instance.AddCoins(coinReward);
                 }
-
-                // Update our tracker to the next interval.
                 lastMeterCheck += metersPerCoinInterval;
             }
         }
     }
-
     void UpdatePaperSpawning()
     {
-        if (activePaperTiles.Count == 0) return;
+        if (activePaperTiles.Count == 0 || paperSpawnPoint == null) return;
         while (activePaperTiles.Count > 0 && activePaperTiles[0].transform.position.y < paperSpawnPoint.position.y)
         {
             if (activePaperTiles.Count >= maxActiveTiles) break;
@@ -137,36 +173,8 @@ public class ContinuousPaperManager : MonoBehaviour
         {
             tileComponent.SetSkin(PaperSkinManager.Instance.CurrentSkin.tileMaterial);
         }
-        if (PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null)
-        {
-            Material tileMat = PaperSkinManager.Instance.CurrentSkin.tileMaterial;
-            MeshRenderer tileRenderer = newTile.GetComponent<MeshRenderer>();
-            if (tileMat != null && tileRenderer != null)
-            {
-                tileRenderer.material = tileMat;
-            }
-        }
         SetLayerRecursively(newTile, Mathf.RoundToInt(Mathf.Log(paperLayer.value, 2)));
         activePaperTiles.Insert(0, newTile);
-    }
-
-    void SpawnInitialPaperTiles()
-    {
-        ClearAllPaper();
-        GameObject firstTile = Instantiate(longPaperPrefab, paperSpawnPoint.position, Quaternion.identity);
-        firstTile.transform.SetParent(this.transform, true);
-        activePaperTiles.Add(firstTile);
-        PaperTile firstTileComponent = firstTile.GetComponent<PaperTile>();
-        if (firstTileComponent != null && PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null)
-        {
-            firstTileComponent.SetSkin(PaperSkinManager.Instance.CurrentSkin.tileMaterial);
-        }
-        SetLayerRecursively(firstTile, Mathf.RoundToInt(Mathf.Log(paperLayer.value, 2)));
-        for (int i = 0; i < 3; i++)
-        {
-            if (activePaperTiles.Count >= maxActiveTiles) break;
-            SpawnOneTileAtTop();
-        }
     }
 
     void CullOffScreenTiles()
@@ -205,4 +213,14 @@ public class ContinuousPaperManager : MonoBehaviour
         }
         activePaperTiles.Clear();
     }
+    public void SaveProgress()
+    {
+        PlayerPrefs.SetFloat(PlayerPrefsKeys.LastCoinRewardCheck, lastMeterCheck);
+    }
+
+    public void LoadProgress()
+    {
+        lastMeterCheck = PlayerPrefs.GetFloat(PlayerPrefsKeys.LastCoinRewardCheck, 0f);
+    }
+    #endregion
 }

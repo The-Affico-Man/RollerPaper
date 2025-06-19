@@ -11,7 +11,7 @@ public class MilestoneManager : MonoBehaviour
     public static MilestoneManager Instance { get; private set; }
 
     private HashSet<Milestone> unlockedMilestones;
-    private HashSet<Milestone> collectedRewards; // NEW: Tracks collected rewards
+    private HashSet<Milestone> collectedRewards;
 
     private void Awake()
     {
@@ -19,7 +19,7 @@ public class MilestoneManager : MonoBehaviour
         else { Instance = this; }
 
         unlockedMilestones = new HashSet<Milestone>();
-        collectedRewards = new HashSet<Milestone>(); // NEW: Initialize the set
+        collectedRewards = new HashSet<Milestone>();
 
         if (allMilestones != null)
         {
@@ -27,7 +27,6 @@ public class MilestoneManager : MonoBehaviour
         }
     }
 
-    // This method NO LONGER gives coins. It only unlocks the milestone.
     public void UnlockMilestone(Milestone milestone)
     {
         if (milestone != null && unlockedMilestones.Add(milestone))
@@ -36,23 +35,14 @@ public class MilestoneManager : MonoBehaviour
         }
     }
 
-    // --- START OF NEW METHODS ---
-
-    /// <summary>
-    /// Checks if a milestone's reward has been collected.
-    /// </summary>
     public bool HasRewardBeenCollected(Milestone milestone)
     {
         return collectedRewards.Contains(milestone);
     }
 
-    /// <summary>
-    /// Called when the player clicks "Collect". Gives coins and marks as collected.
-    /// </summary>
     public void CollectMilestoneReward(Milestone milestone)
     {
         if (milestone == null || !IsMilestoneUnlocked(milestone) || HasRewardBeenCollected(milestone)) return;
-
         if (milestone.coinReward > 0)
         {
             CurrencyManager.Instance.AddCoins(milestone.coinReward);
@@ -60,24 +50,70 @@ public class MilestoneManager : MonoBehaviour
         collectedRewards.Add(milestone);
     }
 
-    /// <summary>
-    /// Checks if ANY unlocked milestone has a reward waiting to be collected.
-    /// Used to show the red dot notification.
-    /// </summary>
     public bool AreThereUncollectedRewards()
     {
-        foreach (Milestone milestone in unlockedMilestones)
+        return unlockedMilestones.Any(unlocked => !HasRewardBeenCollected(unlocked));
+    }
+
+    public bool IsMilestoneUnlocked(Milestone milestone)
+    {
+        return unlockedMilestones.Contains(milestone);
+    }
+
+    // --- NEW SAVE/LOAD METHODS ---
+
+    public void SaveProgress()
+    {
+        string unlockedString = string.Join("|", unlockedMilestones.Select(m => m.milestoneName));
+        PlayerPrefs.SetString(PlayerPrefsKeys.UnlockedMilestones, unlockedString);
+
+        string collectedString = string.Join("|", collectedRewards.Select(m => m.milestoneName));
+        PlayerPrefs.SetString(PlayerPrefsKeys.CollectedMilestoneRewards, collectedString);
+    }
+
+    public void LoadProgress()
+    {
+        // This is a safety check. If for some reason the master list of milestones
+        // isn't assigned in the inspector, we exit early to prevent any errors.
+        if (allMilestones == null)
         {
-            // If we find even one that is unlocked but not collected, return true.
-            if (!HasRewardBeenCollected(milestone))
+            Debug.LogError("MilestoneManager: The 'allMilestones' list has not been assigned in the Inspector!", this.gameObject);
+            return;
+        }
+
+        // --- Load Unlocked Milestones ---
+        unlockedMilestones.Clear();
+        string unlockedString = PlayerPrefs.GetString(PlayerPrefsKeys.UnlockedMilestones);
+
+        // This is the critical fix: Only process the string if it actually has content.
+        if (!string.IsNullOrEmpty(unlockedString))
+        {
+            List<string> unlockedNames = new List<string>(unlockedString.Split('|'));
+            foreach (Milestone m in allMilestones)
             {
-                return true;
+                // Ensure the milestone from our master list is not null before checking its name.
+                if (m != null && unlockedNames.Contains(m.milestoneName))
+                {
+                    unlockedMilestones.Add(m);
+                }
             }
         }
-        return false;
-    }
-    // --- END OF NEW METHODS ---
 
-    public bool IsMilestoneUnlocked(Milestone milestone) { return unlockedMilestones.Contains(milestone); }
-    public void ResetProgress() { if (unlockedMilestones != null) unlockedMilestones.Clear(); if (collectedRewards != null) collectedRewards.Clear(); }
+        // --- Load Collected Rewards ---
+        collectedRewards.Clear();
+        string collectedString = PlayerPrefs.GetString(PlayerPrefsKeys.CollectedMilestoneRewards);
+
+        // Apply the same critical fix here.
+        if (!string.IsNullOrEmpty(collectedString))
+        {
+            List<string> collectedNames = new List<string>(collectedString.Split('|'));
+            foreach (Milestone m in allMilestones)
+            {
+                if (m != null && collectedNames.Contains(m.milestoneName))
+                {
+                    collectedRewards.Add(m);
+                }
+            }
+        }
+    }
 }

@@ -1,22 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
+using System.Linq; // We need this for LINQ queries
 
 public class SkinManager : MonoBehaviour
 {
-    [Tooltip("The list of all available cat skins you have created.")]
     public List<CatSkin> availableSkins;
-
-    [Tooltip("The skin that will be used by default when the game starts.")]
     public CatSkin defaultSkin;
-
     public CatSkin CurrentSkin { get; private set; }
     public static SkinManager Instance { get; private set; }
 
-    private int currentSkinIndex = -1;
-
-    // --- THIS IS THE NEW LOGIC TO TRACK UNLOCKS ---
     private HashSet<CatSkin> unlockedSkins;
-    // ---------------------------------------------
 
     private void Awake()
     {
@@ -28,64 +21,28 @@ public class SkinManager : MonoBehaviour
         {
             Instance = this;
         }
-
-        // Initialize the set when the game starts.
+        // Initialize the set, but don't load here.
         unlockedSkins = new HashSet<CatSkin>();
-    }
-
-    private void Start()
-    {
-        // --- MODIFIED: Automatically unlock the default skin ---
-        if (defaultSkin != null && availableSkins.Contains(defaultSkin))
-        {
-            UnlockSkin(defaultSkin); // Ensure the default is always unlocked
-            SetCurrentSkin(defaultSkin);
-        }
-        else if (availableSkins.Count > 0)
-        {
-            UnlockSkin(availableSkins[0]); // Fallback to the first skin
-            SetCurrentSkin(availableSkins[0]);
-        }
-        else
-        {
-            Debug.LogError("SkinManager has no available skins!");
-        }
-        // ----------------------------------------------------
     }
 
     public void SetCurrentSkin(CatSkin newSkin)
     {
-        // --- MODIFIED: Check if the skin is unlocked before equipping ---
         if (newSkin == null || !availableSkins.Contains(newSkin) || !IsSkinUnlocked(newSkin))
         {
-            Debug.LogWarning($"Attempted to equip a locked or invalid cat skin: {newSkin?.name}");
+            Debug.LogWarning($"Attempted to equip a locked or invalid cat skin: {newSkin?.name}. Equipping default instead.");
+            // Fallback to default if the requested skin is invalid
+            CurrentSkin = defaultSkin;
             return;
         }
-        // ----------------------------------------------------------------
-
-        int skinIndex = availableSkins.IndexOf(newSkin);
-        if (skinIndex != -1)
-        {
-            CurrentSkin = newSkin;
-            currentSkinIndex = skinIndex;
-            Debug.Log($"Current cat skin set to: {CurrentSkin.skinName}");
-        }
+        CurrentSkin = newSkin;
+        Debug.Log($"Current cat skin set to: {CurrentSkin.skinName}");
     }
 
-    // --- THIS IS THE NEW METHOD THE SHOP NEEDS ---
-    /// <summary>
-    /// Checks if a specific skin has been added to the unlocked set.
-    /// </summary>
     public bool IsSkinUnlocked(CatSkin skin)
     {
         return unlockedSkins != null && unlockedSkins.Contains(skin);
     }
-    // ---------------------------------------------
 
-    // --- THIS IS THE NEW METHOD FOR THE SHOP TO CALL ---
-    /// <summary>
-    /// Adds a skin to the unlocked set. This would be called after a successful purchase.
-    /// </summary>
     public void UnlockSkin(CatSkin skin)
     {
         if (skin != null && unlockedSkins != null && !unlockedSkins.Contains(skin))
@@ -94,11 +51,54 @@ public class SkinManager : MonoBehaviour
             Debug.Log($"Cat skin unlocked: {skin.skinName}");
         }
     }
-    // --------------------------------------------------
 
+    // --- NEW SAVE/LOAD METHODS ---
 
-    // Your existing CycleToNextSkin method is unchanged and correct.
-    #region Unchanged Working Code
+    public void SaveProgress()
+    {
+        // 1. Save the equipped skin's name
+        if (CurrentSkin != null)
+        {
+            PlayerPrefs.SetString(PlayerPrefsKeys.EquippedPawSkin, CurrentSkin.skinName);
+        }
+
+        // 2. Save the list of unlocked skins
+        // We convert the list of skin names into a single string like "Default|Calico|Tuxedo"
+        string unlockedSkinsString = string.Join("|", unlockedSkins.Select(s => s.skinName));
+        PlayerPrefs.SetString(PlayerPrefsKeys.UnlockedPawSkins, unlockedSkinsString);
+    }
+
+    public void LoadProgress()
+    {
+        // 1. Load the unlocked skins string
+        string unlockedSkinsString = PlayerPrefs.GetString(PlayerPrefsKeys.UnlockedPawSkins);
+        List<string> unlockedNames = new List<string>(unlockedSkinsString.Split('|'));
+
+        // 2. Populate the unlockedSkins HashSet
+        unlockedSkins.Clear();
+        // Always unlock the default skin as a fallback.
+        if (defaultSkin != null)
+        {
+            unlockedSkins.Add(defaultSkin);
+        }
+        foreach (CatSkin skin in availableSkins)
+        {
+            if (unlockedNames.Contains(skin.skinName))
+            {
+                unlockedSkins.Add(skin);
+            }
+        }
+
+        // 3. Load and set the equipped skin
+        string equippedSkinName = PlayerPrefs.GetString(PlayerPrefsKeys.EquippedPawSkin, defaultSkin?.skinName);
+        CatSkin equippedSkin = availableSkins.Find(s => s.skinName == equippedSkinName);
+
+        // Set the skin. The SetCurrentSkin method already handles fallbacks.
+        SetCurrentSkin(equippedSkin);
+    }
+
+    // Debug cycle method remains unchanged
+    #region Unchanged Debug Cycle
     public void CycleToNextSkin()
     {
         if (availableSkins == null || availableSkins.Count == 0)
@@ -106,16 +106,13 @@ public class SkinManager : MonoBehaviour
             Debug.LogWarning("No skins available to cycle through.");
             return;
         }
-
+        int currentSkinIndex = availableSkins.IndexOf(CurrentSkin);
         currentSkinIndex++;
         if (currentSkinIndex >= availableSkins.Count)
         {
             currentSkinIndex = 0;
         }
-
-        // NOTE: This will still cycle through ALL skins, not just unlocked ones.
-        // This is fine for a debug menu, but for a player-facing feature,
-        // you would want to modify this to only cycle through the 'unlockedSkins' list.
+        // This debug tool will still equip locked skins, which is fine for testing.
         SetCurrentSkin(availableSkins[currentSkinIndex]);
     }
     #endregion

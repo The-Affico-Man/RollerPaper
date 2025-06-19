@@ -50,14 +50,7 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
         if (redDotNotification != null) redDotNotification.SetActive(false);
         if (paperRoller == null) paperRoller = FindFirstObjectByType<PaperRoller>();
         if (paperManager == null) paperManager = FindFirstObjectByType<ContinuousPaperManager>();
-        if (MilestoneManager.Instance != null) { MilestoneManager.Instance.ResetProgress(); }
-
-        // --- THIS IS THE FIX ---
-        if (paperRoller != null)
-        {
-            paperRoller.ResetPosition(); // Changed from ResetState()
-        }
-        // --- END OF FIX ---
+       
 
         FindNextMilestone();
     }
