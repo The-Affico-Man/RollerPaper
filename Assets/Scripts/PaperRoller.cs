@@ -5,7 +5,8 @@ using UnityEngine.UI;
 
 public class PaperRoller : MonoBehaviour
 {
-    // Initialize to 0 here. LoadProgress will overwrite it if a save exists.
+    // --- All of your variables and Awake()/Update() methods are unchanged ---
+    #region Unchanged Code
     public float WorldSpaceDistancePulled { get; private set; } = 0f;
     private float startYPosition;
 
@@ -15,8 +16,6 @@ public class PaperRoller : MonoBehaviour
     public Roller visualRoller;
     private ContinuousPaperManager continuousPaperManager;
 
-    // --- All of your other variables are unchanged ---
-    #region Unchanged Variables
     [Header("Movement Settings")]
     public float pullSensitivity = 30f;
     public float twoFingerBonus = 1.5f;
@@ -39,22 +38,14 @@ public class PaperRoller : MonoBehaviour
     private float lastPullAmount = 0;
     private bool isBoostActive = false;
     private Vector3 initialSpeedLinesPosition;
-    #endregion
 
-    // --- THE KEY FIX: Use Awake() for setup ---
-    // Awake() is guaranteed to run BEFORE the GameDataManager's Start() method.
     void Awake()
     {
-        // Find all the components you need before the game starts.
         swipeController = FindFirstObjectByType<SwipeController>();
         continuousPaperManager = FindFirstObjectByType<ContinuousPaperManager>();
         audioSource = GetComponent<AudioSource>();
         if (audioSource == null) { audioSource = gameObject.AddComponent<AudioSource>(); }
-
-        // CRITICAL: Capture the starting position from the editor.
         startYPosition = transform.position.y;
-
-        // Set up the UI elements.
         if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(false);
         if (boostTimerText != null) boostTimerText.gameObject.SetActive(false);
         if (speedLinesVFX != null)
@@ -64,10 +55,6 @@ public class PaperRoller : MonoBehaviour
         }
     }
 
-    // --- The Start() method is now empty and can be deleted. ---
-    // The line "WorldSpaceDistancePulled = 0f;" was the bug and has been removed.
-
-    // Your Update() method is completely unchanged and correct.
     void Update()
     {
         if (isBoostActive && speedLinesVFX != null)
@@ -118,8 +105,6 @@ public class PaperRoller : MonoBehaviour
         WorldSpaceDistancePulled = startYPosition - transform.position.y;
     }
 
-    // The Save/Load methods are correct as they were.
-    #region Save/Load Methods
     public void SaveProgress()
     {
         PlayerPrefs.SetFloat(PlayerPrefsKeys.TotalDistancePulled, WorldSpaceDistancePulled);
@@ -128,19 +113,32 @@ public class PaperRoller : MonoBehaviour
     public void LoadProgress()
     {
         float savedDistance = PlayerPrefs.GetFloat(PlayerPrefsKeys.TotalDistancePulled, 0f);
-
-        // Because Awake() has already run, startYPosition is guaranteed to be correct here.
         transform.position = new Vector3(transform.position.x, startYPosition - savedDistance, transform.position.z);
-
-        // Now that we have moved, we can calculate the final distance value.
         WorldSpaceDistancePulled = startYPosition - transform.position.y;
-
-        // And finally, tell the paper manager to spawn the tiles at our new, correct location.
         continuousPaperManager?.InitializePaperAtRollerPosition();
     }
     #endregion
 
-    // The power-up methods are correct as they were.
+    // --- NEW DEBUG METHOD ---
+    /// <summary>
+    /// A special method for the debug menu to add distance to the roller.
+    /// </summary>
+    /// <param name="metersToAdd">The number of real-world meters to add.</param>
+    public void AddDebugDistance(float metersToAdd)
+    {
+        if (continuousPaperManager == null || continuousPaperManager.paperTileLength <= 0) return;
+
+        // Convert the real-world meters into Unity's world space units
+        float conversionFactor = continuousPaperManager.realWorldMetersPerTile / continuousPaperManager.paperTileLength;
+        float worldUnitsToAdd = metersToAdd / conversionFactor;
+
+        // Move the roller down by that much
+        transform.position += Vector3.down * worldUnitsToAdd;
+
+        Debug.Log($"Added {metersToAdd} meters to the total distance.");
+    }
+
+    // --- Unchanged Power-up methods ---
     #region Unchanged PowerUp Methods
     public void ActivateSpeedBoost() { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration)); }
     public void ActivateSpeedBoost(float multiplier, float duration) { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(multiplier, duration)); }
