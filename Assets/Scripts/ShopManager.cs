@@ -52,42 +52,49 @@ public class ShopManager : MonoBehaviour
         foreach (CatSkin skin in catSkinManager.availableSkins)
         {
             GameObject itemGO = Instantiate(shopItemPrefab, pawsContentParent);
-
-            // --- THIS IS THE NEW, SIMPLIFIED SETUP ---
-            // Tell the button on the new item everything it needs to know about itself.
             itemGO.GetComponent<ShopItemButton>().Setup(skin, this);
-            // ----------------------------------------
 
-            #region UI State Setup
+            // --- START OF CORRECTED TEXT LOGIC ---
+
+            // Get references to all the UI components by their specific names
             Image itemIcon = itemGO.transform.Find("ItemIcon").GetComponent<Image>();
-            TextMeshProUGUI itemName = itemGO.transform.Find("ItemName").GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI itemPriceText = itemGO.transform.Find("ItemPrice").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI itemNameText = itemGO.transform.Find("ItemName").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI unlockConditionText = itemGO.transform.Find("UnlockCondition_Text").GetComponent<TextMeshProUGUI>();
             Button itemButton = itemGO.GetComponent<Button>();
-            TextMeshProUGUI buttonText = itemButton.GetComponentInChildren<TextMeshProUGUI>();
+            // This now specifically finds the text object for the button's status
+            TextMeshProUGUI buttonStatusText = itemGO.transform.Find("ButtonStatus_Text").GetComponent<TextMeshProUGUI>();
             GameObject lockedOverlay = itemGO.transform.Find("Locked_Overlay").gameObject;
             GameObject equippedCheckmark = itemGO.transform.Find("Equipped_Checkmark").gameObject;
 
-            itemName.text = skin.skinName;
+            // 1. Always set the item's name.
+            itemNameText.text = skin.skinName;
             itemIcon.sprite = skin.pawSprite;
+
+            // 2. Determine the state
             bool isUnlocked = catSkinManager.IsSkinUnlocked(skin);
             bool isEquipped = catSkinManager.CurrentSkin == skin;
+
+            // 3. Set the visual state overlays
             lockedOverlay.SetActive(!isUnlocked);
             equippedCheckmark.SetActive(isEquipped);
             itemButton.interactable = !isEquipped;
 
+            // 4. Set the text for the button and the condition
             if (isUnlocked)
             {
-                itemPriceText.text = "Owned";
-                buttonText.text = isEquipped ? "Equipped" : "Equip";
+                unlockConditionText.text = "Owned";
+                buttonStatusText.text = isEquipped ? "Equipped" : "Equip";
             }
-            else
+            else // Is Locked
             {
-                itemPriceText.text = GetUnlockConditionText(skin);
-                buttonText.text = "Unlock";
+                unlockConditionText.text = GetUnlockConditionText(skin);
+                buttonStatusText.text = "Unlock";
             }
-            #endregion
+            // --- END OF CORRECTED TEXT LOGIC ---
         }
     }
+
+    // In ShopManager.cs
 
     private void PopulatePaperShop()
     {
@@ -97,40 +104,41 @@ public class ShopManager : MonoBehaviour
         foreach (PaperSkin skin in paperSkinManager.availableSkins)
         {
             GameObject itemGO = Instantiate(shopItemPrefab, paperContentParent);
-
-            // --- THIS IS THE NEW, SIMPLIFIED SETUP ---
             itemGO.GetComponent<ShopItemButton>().Setup(skin, this);
-            // ----------------------------------------
 
-            #region UI State Setup
+            // --- APPLY THE SAME CORRECTED TEXT LOGIC HERE ---
+
             Image itemIcon = itemGO.transform.Find("ItemIcon").GetComponent<Image>();
-            TextMeshProUGUI itemName = itemGO.transform.Find("ItemName").GetComponent<TextMeshProUGUI>();
-            TextMeshProUGUI itemPriceText = itemGO.transform.Find("ItemPrice").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI itemNameText = itemGO.transform.Find("ItemName").GetComponent<TextMeshProUGUI>();
+            TextMeshProUGUI unlockConditionText = itemGO.transform.Find("UnlockCondition_Text").GetComponent<TextMeshProUGUI>();
             Button itemButton = itemGO.GetComponent<Button>();
-            TextMeshProUGUI buttonText = itemButton.GetComponentInChildren<TextMeshProUGUI>();
+            // Specifically find the text object for the button's status
+            TextMeshProUGUI buttonStatusText = itemGO.transform.Find("ButtonStatus_Text").GetComponent<TextMeshProUGUI>();
             GameObject lockedOverlay = itemGO.transform.Find("Locked_Overlay").gameObject;
             GameObject equippedCheckmark = itemGO.transform.Find("Equipped_Checkmark").gameObject;
 
-            itemName.text = skin.skinName;
+            itemNameText.text = skin.skinName;
             itemIcon.sprite = skin.thumbnail;
             itemIcon.enabled = (skin.thumbnail != null);
+
             bool isUnlocked = paperSkinManager.IsSkinUnlocked(skin);
             bool isEquipped = paperSkinManager.CurrentSkin == skin;
+
             lockedOverlay.SetActive(!isUnlocked);
             equippedCheckmark.SetActive(isEquipped);
             itemButton.interactable = !isEquipped;
 
             if (isUnlocked)
             {
-                itemPriceText.text = "Owned";
-                buttonText.text = isEquipped ? "Equipped" : "Equip";
+                unlockConditionText.text = "Owned";
+                buttonStatusText.text = isEquipped ? "Equipped" : "Equip";
             }
-            else
+            else // Is Locked
             {
-                itemPriceText.text = GetUnlockConditionText(skin);
-                buttonText.text = "Unlock";
+                unlockConditionText.text = GetUnlockConditionText(skin);
+                buttonStatusText.text = "Unlock";
             }
-            #endregion
+            // --- END OF CORRECTED TEXT LOGIC ---
         }
     }
 
