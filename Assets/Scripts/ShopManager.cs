@@ -10,24 +10,17 @@ public class ShopManager : MonoBehaviour
     public Button pawsTabButton;
     public Button paperTabButton;
 
-    // --- THIS SECTION IS NOW CORRECTED ---
-    [Header("Tab Panels")]
-    [Tooltip("The parent GameObject for the entire Paws scroll view.")]
-    public GameObject pawsTabScrollView; // Was pawsContentPanel
-    [Tooltip("The parent GameObject for the entire Paper scroll view.")]
-    public GameObject paperTabScrollView; // Was paperContentPanel
-
-    [Header("Content Parents (for spawning items into)")]
-    [Tooltip("The Transform of the Content object inside the Paws scroll view.")]
+    [Header("Content Panels")]
+    public GameObject pawsTabScrollView;
+    public GameObject paperTabScrollView;
     public Transform pawsContentParent;
-    [Tooltip("The Transform of the Content object inside the Paper scroll view.")]
     public Transform paperContentParent;
-    // ------------------------------------
 
     [Header("Prefabs")]
     public GameObject shopItemPrefab;
+    public GameObject warningTextPrefab;
+    public Canvas mainCanvas;
 
-    // References to other managers
     #region Manager References
     private SkinManager catSkinManager;
     private PaperSkinManager paperSkinManager;
@@ -44,42 +37,28 @@ public class ShopManager : MonoBehaviour
         milestoneManager = FindFirstObjectByType<MilestoneManager>();
         paperRoller = FindFirstObjectByType<PaperRoller>();
 
-        // This logic now correctly targets the parent ScrollView objects
         if (pawsTabButton != null) pawsTabButton.onClick.AddListener(() => OpenTab(pawsTabScrollView));
         if (paperTabButton != null) paperTabButton.onClick.AddListener(() => OpenTab(paperTabScrollView));
 
-        // Start with the paws tab open
         OpenTab(pawsTabScrollView);
         shopPanel.SetActive(false);
     }
 
-    private void RefreshShop()
-    {
-        PopulatePawsShop();
-        PopulatePaperShop();
-    }
-
-    // --- THIS METHOD IS NOW CORRECTED ---
-    private void OpenTab(GameObject activeScrollView)
-    {
-        // This will now correctly enable/disable the entire ScrollView object
-        pawsTabScrollView.SetActive(activeScrollView == pawsTabScrollView);
-        paperTabScrollView.SetActive(activeScrollView == paperTabScrollView);
-    }
-    // ------------------------------------
-
     private void PopulatePawsShop()
     {
-        // This now correctly targets the content parent transform
         foreach (Transform child in pawsContentParent) { Destroy(child.gameObject); }
         if (catSkinManager == null || catSkinManager.availableSkins == null) return;
 
         foreach (CatSkin skin in catSkinManager.availableSkins)
         {
-            // This now correctly instantiates items into the content parent
             GameObject itemGO = Instantiate(shopItemPrefab, pawsContentParent);
 
-            #region Paw Item Setup
+            // --- THIS IS THE NEW, SIMPLIFIED SETUP ---
+            // Tell the button on the new item everything it needs to know about itself.
+            itemGO.GetComponent<ShopItemButton>().Setup(skin, this);
+            // ----------------------------------------
+
+            #region UI State Setup
             Image itemIcon = itemGO.transform.Find("ItemIcon").GetComponent<Image>();
             TextMeshProUGUI itemName = itemGO.transform.Find("ItemName").GetComponent<TextMeshProUGUI>();
             TextMeshProUGUI itemPriceText = itemGO.transform.Find("ItemPrice").GetComponent<TextMeshProUGUI>();
@@ -87,6 +66,7 @@ public class ShopManager : MonoBehaviour
             TextMeshProUGUI buttonText = itemButton.GetComponentInChildren<TextMeshProUGUI>();
             GameObject lockedOverlay = itemGO.transform.Find("Locked_Overlay").gameObject;
             GameObject equippedCheckmark = itemGO.transform.Find("Equipped_Checkmark").gameObject;
+
             itemName.text = skin.skinName;
             itemIcon.sprite = skin.pawSprite;
             bool isUnlocked = catSkinManager.IsSkinUnlocked(skin);
@@ -94,19 +74,16 @@ public class ShopManager : MonoBehaviour
             lockedOverlay.SetActive(!isUnlocked);
             equippedCheckmark.SetActive(isEquipped);
             itemButton.interactable = !isEquipped;
+
             if (isUnlocked)
             {
                 itemPriceText.text = "Owned";
                 buttonText.text = isEquipped ? "Equipped" : "Equip";
-                itemButton.onClick.RemoveAllListeners();
-                itemButton.onClick.AddListener(() => EquipPawSkin(skin));
             }
             else
             {
                 itemPriceText.text = GetUnlockConditionText(skin);
                 buttonText.text = "Unlock";
-                itemButton.onClick.RemoveAllListeners();
-                itemButton.onClick.AddListener(() => TryUnlockPawSkin(skin));
             }
             #endregion
         }
@@ -114,16 +91,18 @@ public class ShopManager : MonoBehaviour
 
     private void PopulatePaperShop()
     {
-        // This now correctly targets the content parent transform
         foreach (Transform child in paperContentParent) { Destroy(child.gameObject); }
         if (paperSkinManager == null || paperSkinManager.availableSkins == null) return;
 
         foreach (PaperSkin skin in paperSkinManager.availableSkins)
         {
-            // This now correctly instantiates items into the content parent
             GameObject itemGO = Instantiate(shopItemPrefab, paperContentParent);
 
-            #region Paper Item Setup
+            // --- THIS IS THE NEW, SIMPLIFIED SETUP ---
+            itemGO.GetComponent<ShopItemButton>().Setup(skin, this);
+            // ----------------------------------------
+
+            #region UI State Setup
             Image itemIcon = itemGO.transform.Find("ItemIcon").GetComponent<Image>();
             TextMeshProUGUI itemName = itemGO.transform.Find("ItemName").GetComponent<TextMeshProUGUI>();
             TextMeshProUGUI itemPriceText = itemGO.transform.Find("ItemPrice").GetComponent<TextMeshProUGUI>();
@@ -131,6 +110,7 @@ public class ShopManager : MonoBehaviour
             TextMeshProUGUI buttonText = itemButton.GetComponentInChildren<TextMeshProUGUI>();
             GameObject lockedOverlay = itemGO.transform.Find("Locked_Overlay").gameObject;
             GameObject equippedCheckmark = itemGO.transform.Find("Equipped_Checkmark").gameObject;
+
             itemName.text = skin.skinName;
             itemIcon.sprite = skin.thumbnail;
             itemIcon.enabled = (skin.thumbnail != null);
@@ -139,30 +119,144 @@ public class ShopManager : MonoBehaviour
             lockedOverlay.SetActive(!isUnlocked);
             equippedCheckmark.SetActive(isEquipped);
             itemButton.interactable = !isEquipped;
+
             if (isUnlocked)
             {
                 itemPriceText.text = "Owned";
                 buttonText.text = isEquipped ? "Equipped" : "Equip";
-                itemButton.onClick.RemoveAllListeners();
-                itemButton.onClick.AddListener(() => EquipPaperSkin(skin));
             }
             else
             {
                 itemPriceText.text = GetUnlockConditionText(skin);
                 buttonText.text = "Unlock";
-                itemButton.onClick.RemoveAllListeners();
-                itemButton.onClick.AddListener(() => TryUnlockPaperSkin(skin));
             }
             #endregion
         }
     }
 
-    // --- All other methods are correct and unchanged ---
-    #region Unchanged Methods
-    void TryUnlockPawSkin(CatSkin skin) { bool success = false; switch (skin.unlockType) { case UnlockType.ByCoins: if (currencyManager.TrySpendCoins(skin.priceInCoins)) { success = true; } break; case UnlockType.ByMilestone: if (milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) { success = true; } break; case UnlockType.ByTotalDistance: ContinuousPaperManager cpm = FindFirstObjectByType<ContinuousPaperManager>(); float currentMeters = (paperRoller.WorldSpaceDistancePulled * cpm.realWorldMetersPerTile) / cpm.paperTileLength; if (currentMeters >= skin.requiredTotalDistance) { success = true; } break; } if (success) { catSkinManager.UnlockSkin(skin); RefreshShop(); } else { Debug.Log("Unlock conditions not met for " + skin.skinName); } }
-    void TryUnlockPaperSkin(PaperSkin skin) { bool success = false; switch (skin.unlockType) { case UnlockType.ByCoins: if (currencyManager.TrySpendCoins(skin.priceInCoins)) { success = true; } break; case UnlockType.ByMilestone: if (milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) { success = true; } break; case UnlockType.ByTotalDistance: ContinuousPaperManager cpm = FindFirstObjectByType<ContinuousPaperManager>(); float currentMeters = (paperRoller.WorldSpaceDistancePulled * cpm.realWorldMetersPerTile) / cpm.paperTileLength; if (currentMeters >= skin.requiredTotalDistance) { success = true; } break; } if (success) { paperSkinManager.UnlockSkin(skin); RefreshShop(); } else { Debug.Log("Unlock conditions not met for " + skin.skinName); } }
-    void EquipPawSkin(CatSkin skin) { catSkinManager.SetCurrentSkin(skin); RefreshShop(); }
-    void EquipPaperSkin(PaperSkin skin) { paperSkinManager.SetCurrentSkin(skin); RefreshShop(); }
+    // --- NEW UNIFIED UNLOCK METHOD ---
+    public void HandleUnlockAttempt(object skinObject, Vector2 clickPosition)
+    {
+        if (skinObject is CatSkin catSkin)
+        {
+            if (catSkinManager.IsSkinUnlocked(catSkin))
+            {
+                catSkinManager.SetCurrentSkin(catSkin);
+                RefreshShop();
+            }
+            else
+            {
+                TryUnlock(catSkin, clickPosition);
+            }
+        }
+        else if (skinObject is PaperSkin paperSkin)
+        {
+            if (paperSkinManager.IsSkinUnlocked(paperSkin))
+            {
+                paperSkinManager.SetCurrentSkin(paperSkin);
+                RefreshShop();
+            }
+            else
+            {
+                TryUnlock(paperSkin, clickPosition);
+            }
+        }
+    }
+
+    private void TryUnlock(CatSkin skin, Vector2 clickPosition)
+    {
+        string failureReason = "";
+        switch (skin.unlockType)
+        {
+            case UnlockType.ByCoins:
+                if (!currencyManager.TrySpendCoins(skin.priceInCoins)) failureReason = "Not enough coins!";
+                break;
+            case UnlockType.ByMilestone:
+                if (!milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) failureReason = "Milestone not reached!";
+                break;
+            case UnlockType.ByTotalDistance:
+                ContinuousPaperManager cpm = FindFirstObjectByType<ContinuousPaperManager>();
+                float currentMeters = (paperRoller.WorldSpaceDistancePulled * cpm.realWorldMetersPerTile) / cpm.paperTileLength;
+                if (currentMeters < skin.requiredTotalDistance) failureReason = "Not enough distance pulled!";
+                break;
+        }
+
+        if (string.IsNullOrEmpty(failureReason))
+        {
+            catSkinManager.UnlockSkin(skin);
+            RefreshShop();
+        }
+        else { SpawnWarningText(failureReason, clickPosition); }
+    }
+
+    private void TryUnlock(PaperSkin skin, Vector2 clickPosition)
+    {
+        string failureReason = "";
+        switch (skin.unlockType)
+        {
+            case UnlockType.ByCoins:
+                if (!currencyManager.TrySpendCoins(skin.priceInCoins)) failureReason = "Not enough coins!";
+                break;
+            case UnlockType.ByMilestone:
+                if (!milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) failureReason = "Milestone not reached!";
+                break;
+            case UnlockType.ByTotalDistance:
+                ContinuousPaperManager cpm = FindFirstObjectByType<ContinuousPaperManager>();
+                float currentMeters = (paperRoller.WorldSpaceDistancePulled * cpm.realWorldMetersPerTile) / cpm.paperTileLength;
+                if (currentMeters < skin.requiredTotalDistance) failureReason = "Not enough distance pulled!";
+                break;
+        }
+
+        if (string.IsNullOrEmpty(failureReason))
+        {
+            paperSkinManager.UnlockSkin(skin);
+            RefreshShop();
+        }
+        else { SpawnWarningText(failureReason, clickPosition); }
+    }
+    // -------------------------------
+
+    private void SpawnWarningText(string message, Vector2 screenPosition)
+    {
+        if (warningTextPrefab == null || mainCanvas == null)
+        {
+            Debug.LogError("WarningText Prefab or Main Canvas is not assigned in the ShopManager Inspector!");
+            return;
+        }
+
+        GameObject textGO = Instantiate(warningTextPrefab, mainCanvas.transform);
+        textGO.transform.SetAsLastSibling();
+
+        RectTransform textRect = textGO.GetComponent<RectTransform>();
+
+        // --- THIS IS THE DEFINITIVE FIX ---
+
+        // To correctly position a UI element based on a screen point (like a mouse click),
+        // we need to convert the screen point to the local space of the canvas's RectTransform.
+
+        // Get the RectTransform of the main canvas.
+        RectTransform canvasRect = mainCanvas.GetComponent<RectTransform>();
+
+        // Use this special Unity function to do the conversion.
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(
+            canvasRect,
+            screenPosition,
+            mainCanvas.worldCamera, // Assumes you have a camera assigned to your canvas
+            out Vector2 localPoint
+        );
+
+        // Now, set the anchoredPosition to the converted local point.
+        textRect.anchoredPosition = localPoint;
+
+        // --- END OF FIX ---
+
+        textGO.GetComponent<TextMeshProUGUI>().text = message;
+    }
+
+    // Unchanged Methods
+    #region Unchanged Code
+    private void RefreshShop() { PopulatePawsShop(); PopulatePaperShop(); }
+    private void OpenTab(GameObject activeScrollView) { pawsTabScrollView.SetActive(activeScrollView == pawsTabScrollView); paperTabScrollView.SetActive(activeScrollView == paperTabScrollView); }
     public void ToggleShopPanel() { bool isNowActive = !shopPanel.activeSelf; shopPanel.SetActive(isNowActive); if (isNowActive) { RefreshShop(); } if (UIStateManager.Instance != null) { UIStateManager.Instance.SetUIBlockingState(isNowActive); } }
     private string GetUnlockConditionText(CatSkin skin) { switch (skin.unlockType) { case UnlockType.ByCoins: return $"{skin.priceInCoins} Coins"; case UnlockType.ByMilestone: return $"Reach {skin.requiredMilestone.milestoneName}"; case UnlockType.ByTotalDistance: return $"Pull {skin.requiredTotalDistance}m Total"; case UnlockType.Premium: return "Premium"; default: return "Locked"; } }
     private string GetUnlockConditionText(PaperSkin skin) { switch (skin.unlockType) { case UnlockType.ByCoins: return $"{skin.priceInCoins} Coins"; case UnlockType.ByMilestone: return $"Reach {skin.requiredMilestone.milestoneName}"; case UnlockType.ByTotalDistance: return $"Pull {skin.requiredTotalDistance}m Total"; case UnlockType.Premium: return "Premium"; default: return "Locked"; } }
