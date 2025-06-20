@@ -80,7 +80,17 @@ public class ContinuousPaperManager : MonoBehaviour
     // The rest of your script is completely unchanged.
     #region Unchanged Methods
     public void InitializePaperAtRollerPosition() { if (toiletPaperRoll == null || paperSpawnPoint == null || paperRoller == null) { Debug.LogError("ContinuousPaperManager: A critical reference is not set! Cannot spawn paper.", this.gameObject); return; } SpawnInitialPaperTiles(); }
-    void SpawnInitialPaperTiles() { ClearAllPaper(); Vector3 spawnPosition; if (paperRoller.WorldSpaceDistancePulled < 0.01f) { spawnPosition = paperSpawnPoint.position; } else { spawnPosition = toiletPaperRoll.position; } GameObject firstTile = Instantiate(longPaperPrefab, spawnPosition, Quaternion.identity); firstTile.transform.SetParent(this.transform, true); activePaperTiles.Add(firstTile); PaperTile firstTileComponent = firstTile.GetComponent<PaperTile>(); if (firstTileComponent != null && PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null) { firstTileComponent.SetSkin(PaperSkinManager.Instance.CurrentSkin.tileMaterial); } SetLayerRecursively(firstTile, Mathf.RoundToInt(Mathf.Log(paperLayer.value, 2))); for (int i = 0; i < 3; i++) { if (activePaperTiles.Count >= maxActiveTiles) break; SpawnOneTileAtTop(); } }
+    void SpawnInitialPaperTiles() { ClearAllPaper(); Vector3 spawnPosition; if (paperRoller.WorldSpaceDistancePulled < 0.01f) { spawnPosition = paperSpawnPoint.position; } else
+        {
+            float correctY = toiletPaperRoll.position.y;
+
+            // 2. Get the correct X and Z position from the spawn point, which is always centered.
+            float correctX = paperSpawnPoint.position.x;
+            float correctZ = paperSpawnPoint.position.z;
+
+            // 3. Combine them to create the perfect spawn position.
+            spawnPosition = new Vector3(correctX, correctY, correctZ);
+        } GameObject firstTile = Instantiate(longPaperPrefab, spawnPosition, Quaternion.identity); firstTile.transform.SetParent(this.transform, true); activePaperTiles.Add(firstTile); PaperTile firstTileComponent = firstTile.GetComponent<PaperTile>(); if (firstTileComponent != null && PaperSkinManager.Instance != null && PaperSkinManager.Instance.CurrentSkin != null) { firstTileComponent.SetSkin(PaperSkinManager.Instance.CurrentSkin.tileMaterial); } SetLayerRecursively(firstTile, Mathf.RoundToInt(Mathf.Log(paperLayer.value, 2))); for (int i = 0; i < 3; i++) { if (activePaperTiles.Count >= maxActiveTiles) break; SpawnOneTileAtTop(); } }
     void Update() { CullOffScreenTiles(); UpdatePaperLengthUI(); }
     void LateUpdate() { UpdatePaperSpawning(); }
     void UpdatePaperLengthUI() { if (paperLengthText != null && paperRoller != null) { float worldDistance = paperRoller.WorldSpaceDistancePulled; float conversionFactor = realWorldMetersPerTile / paperTileLength; float totalLengthMeters = worldDistance * conversionFactor; paperLengthText.text = $"{totalLengthMeters:F2}"; if (totalLengthMeters - lastMeterCheck >= metersPerCoinInterval) { int coinReward = 0; foreach (RewardTier tier in rewardTiers) { if (lastMeterCheck < tier.distanceThreshold) { coinReward = tier.coinAmount; break; } } if (coinReward == 0 && rewardTiers.Count > 0) { coinReward = rewardTiers.Last().coinAmount; } if (coinReward > 0) { CurrencyManager.Instance.AddCoins(coinReward); } lastMeterCheck += metersPerCoinInterval; } } }
