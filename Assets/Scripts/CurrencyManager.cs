@@ -10,8 +10,6 @@ public class CurrencyManager : MonoBehaviour
     public TextMeshProUGUI coinUIText;
 
     [Header("Coin Animation")]
-    [Tooltip("Drag your new FlyingCoinsEffect prefab here.")]
-    public ParticleSystem coinEffectPrefab;
     [Tooltip("Drag your 'TopLayerCanvas' object from the scene hierarchy here.")]
     public Canvas topLayerCanvas;
     [Tooltip("How many visual coins to show for a large reward.")]
@@ -22,48 +20,59 @@ public class CurrencyManager : MonoBehaviour
     public AudioClip coinSound;
     private AudioSource audioSource;
 
-    // ... other variables and Awake() are unchanged ...
-    #region Unchanged Code
     public int CurrentCoins { get; private set; }
     public static event System.Action<int> OnCoinsChanged;
-    private void Awake() { if (Instance != null && Instance != this) { Destroy(this.gameObject); } else { Instance = this; } audioSource = gameObject.AddComponent<AudioSource>(); }
-    #endregion
+
+    private void Awake()
+    {
+        if (Instance != null && Instance != this) { Destroy(this.gameObject); }
+        else { Instance = this; }
+        audioSource = gameObject.AddComponent<AudioSource>();
+    }
 
     public void AddCoinsWithAnimation(int amount, Vector3 startWorldPosition)
     {
-        if (coinEffectPrefab == null || topLayerCanvas == null)
+        if (topLayerCanvas == null)
         {
             AddCoins(amount);
             return;
         }
 
-        // 1. Instantiate the effect prefab.
-        ParticleSystem effectInstance = Instantiate(coinEffectPrefab);
+        // 1. Spawn the effect from the pool. The pooler places it at the correct world position.
+        GameObject effectGO = ParticlePooler.Instance?.SpawnFromPool("FlyingCoins", startWorldPosition, Quaternion.identity);
 
-        // 2. Set the parent to the TopLayerCanvas.
-        // The 'false' parameter resets its local transform, which is good practice.
-        effectInstance.transform.SetParent(topLayerCanvas.transform, false);
+        if (effectGO != null)
+        {
+            ParticleSystem effectInstance = effectGO.GetComponent<ParticleSystem>();
 
-        // 3. Set its world position.
-        effectInstance.transform.position = startWorldPosition;
+            // --- THIS IS THE DEFINITIVE FIX ---
 
-        // 4. Configure the particle count
-        var emission = effectInstance.emission;
-        float coinsToSpawnRatio = (float)amount / 50f;
-        int burstCount = (int)Mathf.Clamp(coinsToSpawnRatio, 5, maxVisualCoins);
-        emission.SetBurst(0, new ParticleSystem.Burst(0.0f, burstCount));
+            // 2. Set its parent to the TopLayerCanvas, with 'worldPositionStays' set to 'false'.
+            // This is CRITICAL. It resets the particle system's local scale to (1,1,1)
+            // and local position to (0,0,0), fixing the gigantic scale bug.
+            effectInstance.transform.SetParent(topLayerCanvas.transform, false);
 
-        // 5. --- THIS IS THE FINAL FIX ---
-        // Configure the force to attract particles towards the coin UI, but ONLY in X and Y.
-        var forceModule = effectInstance.forceOverLifetime;
-        forceModule.enabled = true;
-        Vector3 targetPos = coinUIText.transform.position;
+            // 3. NOW that it is properly parented and scaled, set its world position again.
+            // This correctly places the clean, newly-parented object at the desired start point.
+            effectInstance.transform.position = startWorldPosition;
 
-        // We only create curves for X and Y. Z is left as a constant 0 from the prefab.
-        forceModule.x = CreateAttractionCurve(startWorldPosition.x, targetPos.x);
-        forceModule.y = CreateAttractionCurve(startWorldPosition.y, targetPos.y);
+            // --- END OF FIX ---
 
-        // 6. Play sound and add coins
+            // 4. Configure the rest of the effect as before. This logic is correct.
+            var emission = effectInstance.emission;
+            float coinsToSpawnRatio = (float)amount / 50f;
+            int burstCount = (int)Mathf.Clamp(coinsToSpawnRatio, 5, maxVisualCoins);
+            emission.SetBurst(0, new ParticleSystem.Burst(0.0f, burstCount));
+
+            var forceModule = effectInstance.forceOverLifetime;
+            forceModule.enabled = true;
+            Vector3 targetPos = coinUIText.transform.position;
+            forceModule.x = CreateAttractionCurve(startWorldPosition.x, targetPos.x);
+            forceModule.y = CreateAttractionCurve(startWorldPosition.y, targetPos.y);
+            forceModule.z = CreateAttractionCurve(startWorldPosition.z, targetPos.z);
+        }
+
+        // Play sound and add coins
         if (audioSource != null && coinSound != null)
         {
             audioSource.PlayOneShot(coinSound);

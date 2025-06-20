@@ -79,12 +79,8 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
             MilestoneManager.Instance.UnlockMilestone(unlockedMilestone);
             string message = $"MILESTONE REACHED!\n<size=80%>{unlockedMilestone.milestoneName}";
             StartCoroutine(ShowAnimatedPanel(message, celebrationDuration, true));
-            if (confettiEffectPrefab != null)
-            {
-                // If a spawn point is assigned, use it. Otherwise, spawn at the center of the world.
-                Vector3 spawnPos = confettiSpawnPoint != null ? confettiSpawnPoint.position : Vector3.zero;
-                Instantiate(confettiEffectPrefab, spawnPos, Quaternion.identity);
-            }
+            Vector3 spawnPos = confettiSpawnPoint != null ? confettiSpawnPoint.position : Vector3.zero;
+            ParticlePooler.Instance?.SpawnFromPool("Confetti", spawnPos, Quaternion.identity);
             FindNextMilestone();
         }
     }
