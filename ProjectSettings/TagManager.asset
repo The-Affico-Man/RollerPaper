@@ -8,7 +8,7 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - VFX
   - Water
   - UI
   - PawLayer
@@ -38,6 +38,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: VFX
+    uniqueID: 1364354699
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

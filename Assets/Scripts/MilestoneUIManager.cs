@@ -25,7 +25,10 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
     public float notificationDuration = 3f;
     [Tooltip("How long the celebration stays on screen before sliding out.")]
     public float celebrationDuration = 4f;
-
+    [Tooltip("Drag your new ConfettiEffect prefab here.")]
+    public GameObject confettiEffectPrefab;
+    [Tooltip("An optional transform to control where the confetti spawns. If empty, it will spawn at the center of the screen.")]
+    public Transform confettiSpawnPoint;
     // Unchanged variables
     #region Unchanged Variables
     private RectTransform contentPanel;
@@ -75,7 +78,13 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
             Milestone unlockedMilestone = nextMilestoneToUnlock;
             MilestoneManager.Instance.UnlockMilestone(unlockedMilestone);
             string message = $"MILESTONE REACHED!\n<size=80%>{unlockedMilestone.milestoneName}";
-            StartCoroutine(ShowAnimatedPanel(message, celebrationDuration));
+            StartCoroutine(ShowAnimatedPanel(message, celebrationDuration, true));
+            if (confettiEffectPrefab != null)
+            {
+                // If a spawn point is assigned, use it. Otherwise, spawn at the center of the world.
+                Vector3 spawnPos = confettiSpawnPoint != null ? confettiSpawnPoint.position : Vector3.zero;
+                Instantiate(confettiEffectPrefab, spawnPos, Quaternion.identity);
+            }
             FindNextMilestone();
         }
     }
@@ -89,56 +98,63 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
         {
             float distanceToShow = (distanceToNext < 0.1f) ? 0.1f : distanceToNext;
             string message = $"Almost there! Just {distanceToShow:F1}m to the {nextMilestoneToUnlock.milestoneName}!";
-            StartCoroutine(ShowAnimatedPanel(message, notificationDuration));
+            StartCoroutine(ShowAnimatedPanel(message, notificationDuration, false));
             currentlyNotifiedMilestone = nextMilestoneToUnlock;
         }
     }
 
-    private IEnumerator ShowAnimatedPanel(string message, float duration)
+    private IEnumerator ShowAnimatedPanel(string message, float duration, bool showConfetti)
     {
-        // --- THIS IS THE FIX (Part 2): Add safety checks and use the canvas ---
-        if (notificationPanelPrefab == null)
-        {
-            Debug.LogError("Notification Panel Prefab is not assigned!", this.gameObject);
-            yield break;
-        }
-        if (mainCanvas == null)
-        {
-            Debug.LogError("Main Canvas is not assigned!", this.gameObject);
-            yield break;
-        }
+        if (notificationPanelPrefab == null || mainCanvas == null) yield break;
 
         isNotificationShowing = true;
 
-        // 1. Create an instance of the panel prefab AS A CHILD OF THE CANVAS
+        // 1. Create the UI panel instance
         GameObject panelInstance = Instantiate(notificationPanelPrefab, mainCanvas.transform);
-
-        // 2. Set it to be the first child, so it renders BEHIND other UI elements.
         panelInstance.transform.SetAsFirstSibling();
-
-        // 3. Get its components
         Animator animator = panelInstance.GetComponent<Animator>();
         TextMeshProUGUI textComponent = panelInstance.GetComponentInChildren<TextMeshProUGUI>();
-
-        // 4. Set the message
         if (textComponent != null)
         {
             textComponent.text = message;
         }
 
-        // 5. Wait for the specified duration while it's on-screen
-        yield return new WaitForSeconds(duration);
+        // --- NEW LOGIC: Spawn confetti after the panel slides in ---
 
-        // 6. Trigger the slide-out animation
+        // Wait for the slide-in animation to finish (e.g., 0.5 seconds)
+        yield return new WaitForSeconds(0.5f);
+
+        if (showConfetti && confettiEffectPrefab != null)
+        {
+            // 2. Get the RectTransform of the UI panel we just created.
+            RectTransform panelRect = panelInstance.GetComponent<RectTransform>();
+
+            // 3. Get the main camera.
+            Camera mainCamera = Camera.main;
+
+            // 4. Convert the center of the UI panel's rectangle into a 3D world point.
+            //    We tell it to place the point 10 units away from the camera.
+            Vector3 spawnPos = mainCamera.ScreenToWorldPoint(new Vector3(panelRect.position.x, panelRect.position.y, 10));
+
+            // 5. Instantiate the confetti at that calculated 3D position.
+            Instantiate(confettiEffectPrefab, spawnPos, Quaternion.identity);
+        }
+        // --- END OF NEW LOGIC ---
+
+        // 6. Wait for the rest of the specified duration.
+        //    We subtract the 0.5s we already waited for the slide-in.
+        yield return new WaitForSeconds(duration - 0.5f);
+
+        // 7. Trigger the slide-out animation.
         if (animator != null)
         {
             animator.SetTrigger("Hide");
         }
 
-        // 7. Wait for the slide-out animation to finish before destroying
+        // 8. Wait for the slide-out animation to finish before destroying.
         yield return new WaitForSeconds(0.5f);
 
-        // 8. Clean up the instance
+        // 9. Clean up the instance.
         Destroy(panelInstance);
 
         isNotificationShowing = false;
