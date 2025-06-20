@@ -24,11 +24,14 @@ public class MilestoneItemController : MonoBehaviour
 
         // Tell the main manager to collect the reward for our assigned milestone.
         //  MilestoneManager.Instance.CollectMilestoneReward(assignedMilestone);
-        Vector3 buttonPosition = this.transform.position;
+        Vector3 buttonWorldPosition = this.transform.position;
 
-        // Tell the main manager to collect the reward, now passing the button's position.
-        MilestoneManager.Instance.CollectMilestoneReward(assignedMilestone, buttonPosition);
-        // Tell the UI manager to rebuild the list to reflect the change.
+        // OLD, WRONG WAY:
+        // MilestoneManager.Instance.CollectMilestoneReward(assignedMilestone, buttonWorldPosition); 
+
+        // NEW, CORRECT WAY: We now pass this world position directly to the new method.
+        MilestoneManager.Instance.CollectMilestoneRewardFromWorld(assignedMilestone, buttonWorldPosition); 
+        
         uiManager.RefreshMilestoneList();
     }
 }

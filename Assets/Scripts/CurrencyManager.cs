@@ -4,61 +4,53 @@ using TMPro;
 
 public class CurrencyManager : MonoBehaviour
 {
+    // ... Variables and Awake() are unchanged ...
+    #region Unchanged Code
     public static CurrencyManager Instance { get; private set; }
-
     [Header("UI Reference")]
     public TextMeshProUGUI coinUIText;
-
     [Header("Coin Animation")]
-    [Tooltip("Drag your 'TopLayerCanvas' object from the scene hierarchy here.")]
     public Canvas topLayerCanvas;
-    [Tooltip("How many visual coins to show for a large reward.")]
     public int maxVisualCoins = 30;
-    [Tooltip("How long the animation takes for a single coin to travel.")]
     public float coinMoveDuration = 1.5f;
-
     public AudioClip coinSound;
     private AudioSource audioSource;
-
+    private Camera mainCamera;
     public int CurrentCoins { get; private set; }
     public static event System.Action<int> OnCoinsChanged;
+    private void Awake() { if (Instance != null && Instance != this) { Destroy(this.gameObject); } else { Instance = this; } audioSource = gameObject.AddComponent<AudioSource>(); mainCamera = Camera.main; }
+    #endregion
 
-    private void Awake()
+    // --- NEW PUBLIC METHOD #1 (For Buttons) ---
+    public void AddCoinsFromWorldPosition(int amount, Vector3 startWorldPosition)
     {
-        if (Instance != null && Instance != this) { Destroy(this.gameObject); }
-        else { Instance = this; }
-        audioSource = gameObject.AddComponent<AudioSource>();
+        // This method directly uses the provided world position.
+        StartCoroutine(AnimateCoins(amount, startWorldPosition));
     }
 
-    public void AddCoinsWithAnimation(int amount, Vector3 startWorldPosition)
+    // --- NEW PUBLIC METHOD #2 (For Score Text) ---
+    public void AddCoinsFromScreenPosition(int amount, Vector2 startScreenPosition)
     {
-        if (topLayerCanvas == null)
-        {
-            AddCoins(amount);
-            return;
-        }
+        if (mainCamera == null || topLayerCanvas == null) { AddCoins(amount); return; }
 
-        // 1. Spawn the effect from the pool. The pooler places it at the correct world position.
+        // This method converts the screen position to a world position before animating.
+        Vector3 worldPos = mainCamera.ScreenToWorldPoint(new Vector3(startScreenPosition.x, startScreenPosition.y, topLayerCanvas.planeDistance));
+        StartCoroutine(AnimateCoins(amount, worldPos));
+    }
+
+    // --- The Core Animation Logic (Now private) ---
+    public IEnumerator AnimateCoins(int amount, Vector3 startWorldPosition)
+    {
+        if (topLayerCanvas == null) { AddCoins(amount); yield break; }
+
         GameObject effectGO = ParticlePooler.Instance?.SpawnFromPool("FlyingCoins", startWorldPosition, Quaternion.identity);
 
         if (effectGO != null)
         {
             ParticleSystem effectInstance = effectGO.GetComponent<ParticleSystem>();
-
-            // --- THIS IS THE DEFINITIVE FIX ---
-
-            // 2. Set its parent to the TopLayerCanvas, with 'worldPositionStays' set to 'false'.
-            // This is CRITICAL. It resets the particle system's local scale to (1,1,1)
-            // and local position to (0,0,0), fixing the gigantic scale bug.
             effectInstance.transform.SetParent(topLayerCanvas.transform, false);
-
-            // 3. NOW that it is properly parented and scaled, set its world position again.
-            // This correctly places the clean, newly-parented object at the desired start point.
             effectInstance.transform.position = startWorldPosition;
 
-            // --- END OF FIX ---
-
-            // 4. Configure the rest of the effect as before. This logic is correct.
             var emission = effectInstance.emission;
             float coinsToSpawnRatio = (float)amount / 50f;
             int burstCount = (int)Mathf.Clamp(coinsToSpawnRatio, 5, maxVisualCoins);
@@ -72,7 +64,6 @@ public class CurrencyManager : MonoBehaviour
             forceModule.z = CreateAttractionCurve(startWorldPosition.z, targetPos.z);
         }
 
-        // Play sound and add coins
         if (audioSource != null && coinSound != null)
         {
             audioSource.PlayOneShot(coinSound);
@@ -80,7 +71,7 @@ public class CurrencyManager : MonoBehaviour
         AddCoins(amount);
     }
 
-    // The rest of the script is correct and unchanged
+    // --- The rest of the script is unchanged and correct ---
     #region Unchanged Methods
     private ParticleSystem.MinMaxCurve CreateAttractionCurve(float start, float end) { float distance = end - start; var curve = new AnimationCurve(); curve.AddKey(0.0f, 0.0f); curve.AddKey(1.0f, distance * 2.0f); return new ParticleSystem.MinMaxCurve(1.0f, curve); }
     public void AddCoins(int amount) { if (amount <= 0) return; CurrentCoins += amount; UpdateUI(); }

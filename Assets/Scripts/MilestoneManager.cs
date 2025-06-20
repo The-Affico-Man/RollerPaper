@@ -34,7 +34,7 @@ public class MilestoneManager : MonoBehaviour
             Debug.Log($"Milestone Unlocked: {milestone.milestoneName}");
         }
     }
-    public void CollectMilestoneReward(Milestone milestone, Vector3 startPosition)
+   /*public void CollectMilestoneReward(Milestone milestone, Vector3 startPosition)
     {
         if (milestone == null || !IsMilestoneUnlocked(milestone) || HasRewardBeenCollected(milestone)) return;
 
@@ -44,13 +44,24 @@ public class MilestoneManager : MonoBehaviour
             CurrencyManager.Instance.AddCoinsWithAnimation(milestone.coinReward, startPosition);
         }
         collectedRewards.Add(milestone);
+    }*/
+    public void CollectMilestoneRewardFromWorld(Milestone milestone, Vector3 startWorldPosition)
+    {
+        if (milestone == null || !IsMilestoneUnlocked(milestone) || HasRewardBeenCollected(milestone)) return;
+
+        if (milestone.coinReward > 0)
+        {
+            // Call the new, specific method for world positions
+            CurrencyManager.Instance.AddCoinsFromWorldPosition(milestone.coinReward, startWorldPosition);
+        }
+        collectedRewards.Add(milestone);
     }
     public bool HasRewardBeenCollected(Milestone milestone)
     {
         return collectedRewards.Contains(milestone);
     }
 
-    public void CollectMilestoneReward(Milestone milestone)
+    /*public void CollectMilestoneReward(Milestone milestone)
     {
         if (milestone == null || !IsMilestoneUnlocked(milestone) || HasRewardBeenCollected(milestone)) return;
         if (milestone.coinReward > 0)
@@ -59,7 +70,7 @@ public class MilestoneManager : MonoBehaviour
             CurrencyManager.Instance.AddCoinsWithAnimation(milestone.coinReward, buttonPosition);
         }
         collectedRewards.Add(milestone);
-    }
+    }*/
 
     public bool AreThereUncollectedRewards()
     {
