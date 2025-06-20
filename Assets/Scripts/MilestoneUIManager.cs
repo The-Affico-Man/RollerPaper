@@ -15,6 +15,10 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
     public ScrollRect scrollRect;
     public GameObject redDotNotification;
 
+    [Header("Other UI Manager References")]
+    [Tooltip("Drag the GameObject that has the ShopManager script on it here.")]
+    public ShopManager shopManager;
+
     [Header("Notification System")]
     [Tooltip("Drag your new NotificationPanel prefab here.")]
     public GameObject notificationPanelPrefab;
@@ -160,7 +164,32 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
     #region Unchanged Methods
     private void Update() { if (milestoneScreenPanel.activeSelf && !isDragging && scrollRect.velocity.magnitude < snapVelocityThreshold) { FindClosestSnapPointAndSetTarget(); if (snapPositionsX.Count > 0 && currentSnapTargetIndex < snapPositionsX.Count) { Vector2 targetPosition = new Vector2(snapPositionsX[currentSnapTargetIndex], contentPanel.anchoredPosition.y); contentPanel.anchoredPosition = Vector2.Lerp(contentPanel.anchoredPosition, targetPosition, Time.deltaTime * snapSpeed); } } }
     private void BuildMilestoneList() { foreach (var item in spawnedMilestoneItems) { Destroy(item); } spawnedMilestoneItems.Clear(); snapPositionsX.Clear(); if (MilestoneManager.Instance == null || milestoneItemPrefab == null) return; float itemWidth = milestoneItemPrefab.GetComponent<RectTransform>().rect.width; float currentXPosition = leftPadding; for (int i = 0; i < MilestoneManager.Instance.SortedMilestones.Count; i++) { Milestone milestone = MilestoneManager.Instance.SortedMilestones[i]; GameObject newItem = Instantiate(milestoneItemPrefab, contentPanel); MilestoneItemController itemController = newItem.GetComponent<MilestoneItemController>(); itemController.Setup(milestone, this); RectTransform newItemRect = newItem.GetComponent<RectTransform>(); newItemRect.anchorMin = new Vector2(0, 0.5f); newItemRect.anchorMax = new Vector2(0, 0.5f); newItemRect.pivot = new Vector2(0, 0.5f); newItemRect.anchoredPosition = new Vector2(currentXPosition, 0); Button collectButton = newItem.transform.Find("Collect_Button").GetComponent<Button>(); TextMeshProUGUI nameText = newItem.transform.Find("NameText").GetComponent<TextMeshProUGUI>(); Image icon = newItem.transform.Find("Icon").GetComponent<Image>(); bool isUnlocked = MilestoneManager.Instance.IsMilestoneUnlocked(milestone); bool rewardCollected = MilestoneManager.Instance.HasRewardBeenCollected(milestone); if (isUnlocked) { icon.color = Color.white; string measurementWord = (milestone.measurementType == MilestoneType.Height) ? "Height" : "Length"; nameText.text = $"You reached the {measurementWord} of\n<b>{milestone.milestoneName}</b>"; collectButton.gameObject.SetActive(!rewardCollected); } else { icon.color = Color.black; nameText.text = milestone.milestoneName; collectButton.gameObject.SetActive(false); } newItem.name = $"Milestone_{milestone.milestoneName}"; float snapPosX = firstItemCenterPosX - (i * snapJumpValue); snapPositionsX.Add(snapPosX); currentXPosition += itemWidth + itemSpacing; newItem.transform.Find("DistanceText").GetComponent<TextMeshProUGUI>().text = $"{milestone.distanceInMeters} m"; icon.sprite = milestone.milestoneIcon; spawnedMilestoneItems.Add(newItem); } float totalContentWidth = currentXPosition - itemSpacing + rightPadding; contentPanel.sizeDelta = new Vector2(totalContentWidth, contentPanel.sizeDelta.y); }
-    public void ToggleMilestoneScreen() { bool isNowActive = !milestoneScreenPanel.activeSelf; milestoneScreenPanel.SetActive(isNowActive); if (isNowActive) { RefreshMilestoneList(); SnapToLatestUnlockedMilestone(); } if (UIStateManager.Instance != null) { UIStateManager.Instance.SetUIBlockingState(isNowActive); } }
+    public void ToggleMilestoneScreen()
+    {
+        bool isOpening = !milestoneScreenPanel.activeSelf;
+
+        if (isOpening)
+        {
+            // If we are opening the milestone screen, first make sure the shop is closed.
+            shopManager?.CloseShopPanel(); // We just added this method to ShopManager
+
+            RefreshMilestoneList();
+            SnapToLatestUnlockedMilestone();
+        }
+
+        milestoneScreenPanel.SetActive(isOpening);
+
+        // Always update the central UI state
+        UIStateManager.Instance?.SetUIBlockingState(isOpening);
+    }
+    public void CloseMilestoneScreen()
+    {
+        if (milestoneScreenPanel.activeSelf)
+        {
+            milestoneScreenPanel.SetActive(false);
+        }
+    }
+
     public void RefreshMilestoneList() { BuildMilestoneList(); }
     private void CheckForUncollectedRewards() { if (redDotNotification != null) { redDotNotification.SetActive(MilestoneManager.Instance.AreThereUncollectedRewards()); } }
     private void SetSnapPosition(int index, bool immediate = false) { if (snapPositionsX.Count == 0 || index < 0 || index >= snapPositionsX.Count) return; currentSnapTargetIndex = index; if (immediate) { Vector2 targetPosition = new Vector2(snapPositionsX[currentSnapTargetIndex], contentPanel.anchoredPosition.y); contentPanel.anchoredPosition = targetPosition; } }

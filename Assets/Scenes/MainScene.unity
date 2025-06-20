@@ -549,6 +549,7 @@ MonoBehaviour:
   shopItemPrefab: {fileID: 8771264110275453695, guid: c1b831c1efe4f954b81994c3e4831d3e, type: 3}
   warningTextPrefab: {fileID: 3700345469365185250, guid: 0af7f841c9b443249af4ea1d02e33503, type: 3}
   mainCanvas: {fileID: 34373165}
+  milestoneUIManager: {fileID: 1477226191}
 --- !u!4 &85617710
 Transform:
   m_ObjectHideFlags: 0
@@ -8145,6 +8146,7 @@ MonoBehaviour:
   milestoneItemPrefab: {fileID: 2492507170622892192, guid: 7e2b318e0faeb604dacf0390dd9a3182, type: 3}
   scrollRect: {fileID: 1182467118}
   redDotNotification: {fileID: 1969602148}
+  shopManager: {fileID: 85617709}
   notificationPanelPrefab: {fileID: 8037986610030567753, guid: 73dd897e603ffa14fb2424bac1900e25, type: 3}
   mainCanvas: {fileID: 34373165}
   notificationDuration: 3
@@ -12283,7 +12285,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -1737005464, guid: a5e645d0b2507ac42807ef8e886f7d45, type: 3}
+  m_Sprite: {fileID: -1136330797, guid: a5e645d0b2507ac42807ef8e886f7d45, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
