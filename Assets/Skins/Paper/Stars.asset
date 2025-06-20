@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
   m_Name: Stars
   m_EditorClassIdentifier: 
-  unlockType: 0
-  priceInCoins: 1
-  requiredMilestone: {fileID: 0}
+  unlockType: 1
+  priceInCoins: 0
+  requiredMilestone: {fileID: 11400000, guid: 85a83350f2d9d3d42bc13e1c43535105, type: 2}
   requiredTotalDistance: 0
   thumbnail: {fileID: 21300000, guid: a7224c70bc4a66248a52ae746266f130, type: 3}
   skinName: Stars

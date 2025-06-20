@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Snow Leopard
   m_EditorClassIdentifier: 
   unlockType: 0
-  priceInCoins: 1
+  priceInCoins: 600
   requiredMilestone: {fileID: 0}
   skinName: Snow Leopard
   pawSprite: {fileID: -1566750305, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}

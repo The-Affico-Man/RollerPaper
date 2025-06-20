@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tonkinese
   m_EditorClassIdentifier: 
   unlockType: 0
-  priceInCoins: 1
+  priceInCoins: 300
   requiredMilestone: {fileID: 0}
   skinName: Tonkinese
   pawSprite: {fileID: -16908245, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}

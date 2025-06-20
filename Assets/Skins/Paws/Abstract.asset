@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Abstract
   m_EditorClassIdentifier: 
   unlockType: 0
-  priceInCoins: 1
+  priceInCoins: 300
   requiredMilestone: {fileID: 0}
   skinName: Abstract
   pawSprite: {fileID: 1716048465, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}

@@ -12,10 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
   m_Name: OldScroll
   m_EditorClassIdentifier: 
-  unlockType: 0
-  priceInCoins: 1
+  unlockType: 2
+  priceInCoins: 0
   requiredMilestone: {fileID: 0}
-  requiredTotalDistance: 0
+  requiredTotalDistance: 5000
   thumbnail: {fileID: 21300000, guid: 0c746bec7faecb74e845991c8e9a9730, type: 3}
   skinName: Old Scroll
   rollMaterial: {fileID: 2100000, guid: 016a2d4f1f752eb4fa9d4567b47e665d, type: 2}

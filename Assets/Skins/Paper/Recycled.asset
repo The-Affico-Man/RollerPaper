@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fdb7273cf19c7b04babc0d669ac728e4, type: 3}
   m_Name: Recycled
   m_EditorClassIdentifier: 
-  unlockType: 0
-  priceInCoins: 1
-  requiredMilestone: {fileID: 0}
+  unlockType: 1
+  priceInCoins: 0
+  requiredMilestone: {fileID: 11400000, guid: 3f1439326161ead4fb33f60a9c0f048c, type: 2}
   requiredTotalDistance: 0
   thumbnail: {fileID: 21300000, guid: 76e56ace0cf116948a63223e19a35af9, type: 3}
   skinName: Recycled

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Lilac Purple
   m_EditorClassIdentifier: 
   unlockType: 0
-  priceInCoins: 1
+  priceInCoins: 250
   requiredMilestone: {fileID: 0}
   requiredTotalDistance: 0
   thumbnail: {fileID: 21300000, guid: 46d1f02ae0a5a8b40a1d3f97c3ee6b33, type: 3}

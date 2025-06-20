@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Spotted Brown
   m_EditorClassIdentifier: 
   unlockType: 0
-  priceInCoins: 1
+  priceInCoins: 300
   requiredMilestone: {fileID: 0}
   skinName: Spotted Brown
   pawSprite: {fileID: 1352631994, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}

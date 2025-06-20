@@ -16,3 +16,4 @@ MonoBehaviour:
   distanceInMeters: 7.6
   milestoneIcon: {fileID: -572797274, guid: d9c29c10bcd838540b60f9cc6ec7668d, type: 3}
   measurementType: 1
+  coinReward: 25

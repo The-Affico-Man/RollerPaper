@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Hearts
   m_EditorClassIdentifier: 
   unlockType: 0
-  priceInCoins: 1
+  priceInCoins: 250
   requiredMilestone: {fileID: 0}
   requiredTotalDistance: 0
   thumbnail: {fileID: 21300000, guid: 9fd6aa1c693a716469e08476eb2d9e4f, type: 3}

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tabby
   m_EditorClassIdentifier: 
   unlockType: 0
-  priceInCoins: 1
+  priceInCoins: 300
   requiredMilestone: {fileID: 0}
   skinName: Tabby
   pawSprite: {fileID: -1682034444, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}

@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d9a62eef2e395e439fbd01af320f050, type: 3}
   m_Name: Cheetah
   m_EditorClassIdentifier: 
-  unlockType: 0
-  priceInCoins: 1
+  unlockType: 2
+  priceInCoins: 0
   requiredMilestone: {fileID: 0}
   skinName: Cheetah
   pawSprite: {fileID: 1541404143, guid: 6bfbbaafdf089594eb188779a9ab5ea2, type: 3}
-  requiredTotalDistance: 0
+  requiredTotalDistance: 4000
