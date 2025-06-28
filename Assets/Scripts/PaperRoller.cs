@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class PaperRoller : MonoBehaviour
 {
-    // --- All of your variables and Awake()/Update() methods are unchanged ---
-    #region Unchanged Code
     public float WorldSpaceDistancePulled { get; private set; } = 0f;
     private float startYPosition;
 
@@ -68,7 +66,6 @@ public class PaperRoller : MonoBehaviour
         if (swipeController == null) return;
 
         float currentPullAmount;
-
         if (swipeController.GetActivePawCount() > 0)
         {
             currentPullAmount = swipeController.NormalizedPullAmount;
@@ -90,6 +87,20 @@ public class PaperRoller : MonoBehaviour
             float movementDistance = currentPullAmount * finalSensitivity * fingerBonus * speedMultiplier * Time.deltaTime;
             transform.position += Vector3.down * movementDistance;
 
+            // --- THIS IS THE FIX for Distance & Time Challenges ---
+            if (continuousPaperManager != null && continuousPaperManager.paperTileLength > 0)
+            {
+                // 1. Calculate the distance scrolled in REAL METERS.
+                float metersScrolledThisFrame = (movementDistance * continuousPaperManager.realWorldMetersPerTile) / continuousPaperManager.paperTileLength;
+
+                // 2. Report this correct value to the Challenge Manager.
+                ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalDistance, metersScrolledThisFrame);
+                ChallengeManager.Instance?.UpdateScrollInOneRun(metersScrolledThisFrame, Time.deltaTime);
+            }
+            // Report time separately
+            ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalTime, Time.deltaTime);
+            // --------------------------------------------------------
+
             if (visualRoller != null)
             {
                 float spinAmount = movementDistance * 200f;
@@ -98,53 +109,31 @@ public class PaperRoller : MonoBehaviour
                 visualRoller.SetShake(shakeFactor);
             }
         }
-        else if (visualRoller != null)
+        else
         {
-            visualRoller.SetShake(0);
+            ChallengeManager.Instance?.OnScrollStopped();
+            if (visualRoller != null)
+            {
+                visualRoller.SetShake(0);
+            }
         }
-
         WorldSpaceDistancePulled = startYPosition - transform.position.y;
     }
 
-    public void SaveProgress()
-    {
-        PlayerPrefs.SetFloat(PlayerPrefsKeys.TotalDistancePulled, WorldSpaceDistancePulled);
-    }
+    public void SaveProgress() { PlayerPrefs.SetFloat(PlayerPrefsKeys.TotalDistancePulled, WorldSpaceDistancePulled); }
+    public void LoadProgress() { float savedDistance = PlayerPrefs.GetFloat(PlayerPrefsKeys.TotalDistancePulled, 0f); transform.position = new Vector3(transform.position.x, startYPosition - savedDistance, transform.position.z); WorldSpaceDistancePulled = startYPosition - transform.position.y; continuousPaperManager?.InitializePaperAtRollerPosition(); }
+    public void AddDebugDistance(float metersToAdd) { if (continuousPaperManager == null || continuousPaperManager.paperTileLength <= 0) return; float conversionFactor = continuousPaperManager.realWorldMetersPerTile / continuousPaperManager.paperTileLength; float worldUnitsToAdd = metersToAdd / conversionFactor; transform.position += Vector3.down * worldUnitsToAdd; Debug.Log($"Added {metersToAdd} meters to the total distance."); }
 
-    public void LoadProgress()
-    {
-        float savedDistance = PlayerPrefs.GetFloat(PlayerPrefsKeys.TotalDistancePulled, 0f);
-        transform.position = new Vector3(transform.position.x, startYPosition - savedDistance, transform.position.z);
-        WorldSpaceDistancePulled = startYPosition - transform.position.y;
-        continuousPaperManager?.InitializePaperAtRollerPosition();
-    }
-    #endregion
-
-    // --- NEW DEBUG METHOD ---
-    /// <summary>
-    /// A special method for the debug menu to add distance to the roller.
-    /// </summary>
-    /// <param name="metersToAdd">The number of real-world meters to add.</param>
-    public void AddDebugDistance(float metersToAdd)
-    {
-        if (continuousPaperManager == null || continuousPaperManager.paperTileLength <= 0) return;
-
-        // Convert the real-world meters into Unity's world space units
-        float conversionFactor = continuousPaperManager.realWorldMetersPerTile / continuousPaperManager.paperTileLength;
-        float worldUnitsToAdd = metersToAdd / conversionFactor;
-
-        // Move the roller down by that much
-        transform.position += Vector3.down * worldUnitsToAdd;
-
-        Debug.Log($"Added {metersToAdd} meters to the total distance.");
-    }
-
-    // --- Unchanged Power-up methods ---
-    #region Unchanged PowerUp Methods
+    // --- THIS IS THE FIX for Boost Challenges ---
     public void ActivateSpeedBoost() { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration)); }
     public void ActivateSpeedBoost(float multiplier, float duration) { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(multiplier, duration)); }
     private IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
     {
+        // Report events at the START of the boost action
+        ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.UseAnyBoost);
+        ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.UseSpecificBoost, 1, "TurboPaws");
+        ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.WatchRewardedAd);
+
         isBoostActive = true;
         speedMultiplier = multiplier;
         if (speedBoostButton != null) speedBoostButton.SetActive(false);
@@ -165,14 +154,9 @@ public class PaperRoller : MonoBehaviour
         isBoostActive = false;
         if (audioSource != null && boostEndSound != null) audioSource.PlayOneShot(boostEndSound);
         if (boostParticles != null) boostParticles.Stop();
-        if (speedLinesVFX != null)
-        {
-            speedLinesVFX.rectTransform.anchoredPosition = initialSpeedLinesPosition;
-            speedLinesVFX.gameObject.SetActive(false);
-        }
+        if (speedLinesVFX != null) { speedLinesVFX.rectTransform.anchoredPosition = initialSpeedLinesPosition; speedLinesVFX.gameObject.SetActive(false); }
         if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(false);
         if (boostTimerText != null) boostTimerText.gameObject.SetActive(false);
         if (speedBoostButton != null) speedBoostButton.SetActive(true);
     }
-    #endregion
 }

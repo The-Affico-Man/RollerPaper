@@ -14,8 +14,9 @@ public class GameDataManager : MonoBehaviour
     private PaperSkinManager paperSkinManager;
     private PaperRoller paperRoller;
     private ContinuousPaperManager continuousPaperManager;
+    private ChallengeManager challengeManager; // Added reference
 
-    // The key fix: The logic is moved to Start() to guarantee all Awake() methods
+    // The logic is moved to Start() to guarantee all Awake() methods
     // in other scripts have finished running before we try to load anything.
     void Start()
     {
@@ -26,16 +27,14 @@ public class GameDataManager : MonoBehaviour
         paperSkinManager = FindFirstObjectByType<PaperSkinManager>();
         paperRoller = FindFirstObjectByType<PaperRoller>();
         continuousPaperManager = FindFirstObjectByType<ContinuousPaperManager>();
+        challengeManager = FindFirstObjectByType<ChallengeManager>(); // Find the new manager
 
-        // Start the loading process. By running this in Start(), we guarantee
-        // all other scripts have completed their Awake() initialization.
+        // Start the loading process.
         LoadGame();
     }
 
     /// <summary>
-    /// This is called by Unity when the application is about to lose focus,
-    /// such as when the player presses the home button or gets a call.
-    /// This is the safest place to save data on mobile.
+    /// This is called by Unity when the application is about to lose focus.
     /// </summary>
     private void OnApplicationPause(bool pauseStatus)
     {
@@ -58,16 +57,14 @@ public class GameDataManager : MonoBehaviour
     {
         Debug.Log("GameDataManager: Loading all game data...");
 
-        // The load order is still important for dependencies.
+        // Load order can be important. Challenges should load early.
+        challengeManager?.LoadProgress();
         currencyManager?.LoadProgress();
         milestoneManager?.LoadProgress();
         catSkinManager?.LoadProgress();
         paperSkinManager?.LoadProgress();
         continuousPaperManager?.LoadProgress();
-
-        // The PaperRoller is last because it depends on the skin managers being ready
-        // and it triggers the visual setup of the scene.
-        paperRoller?.LoadProgress();
+        paperRoller?.LoadProgress(); // This should often be last
 
         Debug.Log("GameDataManager: All data loaded.");
     }
@@ -78,6 +75,7 @@ public class GameDataManager : MonoBehaviour
         Debug.Log("GameDataManager: Saving all game data...");
 
         // Call the SaveProgress method on each manager.
+        challengeManager?.SaveProgress();
         currencyManager?.SaveProgress();
         milestoneManager?.SaveProgress();
         catSkinManager?.SaveProgress();

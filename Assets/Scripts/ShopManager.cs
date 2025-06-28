@@ -188,7 +188,7 @@ public class ShopManager : MonoBehaviour
         {
             // If we are opening the shop, first make sure the milestone screen is closed.
             milestoneUIManager?.CloseMilestoneScreen(); // We will add this method next
-
+            ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.VisitShop);
             RefreshShop();
         }
 

@@ -1,0 +1,24 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b412152f8a703044bd13cfdf5ad799a, type: 3}
+  m_Name: Weekly_Complete_3_Dailies
+  m_EditorClassIdentifier: 
+  challengeID: WeeklyComplete3Dailies
+  type: 17
+  description: 'Complete {goal} daily challenges this week
+
+'
+  goal: 3
+  coinReward: 1000
+  isDaily: 0
+  isWeekly: 1
+  stringParameter: 

@@ -175,7 +175,7 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
         {
             // If we are opening the milestone screen, first make sure the shop is closed.
             shopManager?.CloseShopPanel(); // We just added this method to ShopManager
-
+            ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.VisitMilestones);
             RefreshMilestoneList();
             SnapToLatestUnlockedMilestone();
         }

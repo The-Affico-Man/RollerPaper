@@ -10,7 +10,7 @@ public static class PlayerPrefsKeys
 
     // --- Currency ---
     public const string PlayerCoins = "Player_CurrentCoins";
-    public const string LastCoinRewardCheck = "Player_LastCoinRewardCheck"; // For ContinuousPaperManager
+    public const string LastCoinRewardCheck = "Player_LastCoinRewardCheck";
 
     // --- Skins ---
     public const string UnlockedPawSkins = "Player_UnlockedPawSkins";
@@ -21,4 +21,23 @@ public static class PlayerPrefsKeys
     // --- Milestones ---
     public const string UnlockedMilestones = "Player_UnlockedMilestones";
     public const string CollectedMilestoneRewards = "Player_CollectedMilestoneRewards";
+
+    // --- Challenges ---
+    public const string ChallengeAnchorDate = "Challenge_AnchorDate";
+    public const string LastDailyResetDay = "Challenge_LastDailyResetDay";
+    public const string LastWeeklyResetWeek = "Challenge_LastWeeklyResetWeek";
+
+    public const string ActiveDailyIDs = "Challenge_ActiveDailyIDs";
+    public const string ActiveDailyProgress = "Challenge_ActiveDailyProgress";
+    public const string ClaimedDailies = "Challenge_ClaimedDailies";
+
+    public const string ActiveWeeklyIDs = "Challenge_ActiveWeeklyIDs";
+    public const string ActiveWeeklyProgress = "Challenge_ActiveWeeklyProgress";
+    public const string ClaimedWeeklies = "Challenge_ClaimedWeeklies";
+
+    public const string DaysPlayedThisWeek = "Challenge_DaysPlayedThisWeek";
+    public const string CompletedDailiesThisWeek = "Challenge_CompletedDailiesThisWeek";
+
+    public const string UsedPawSkinsThisWeek = "Challenge_UsedPawSkinsThisWeek";
+    public const string UsedPaperSkinsThisWeek = "Challenge_UsedPaperSkinsThisWeek";
 }

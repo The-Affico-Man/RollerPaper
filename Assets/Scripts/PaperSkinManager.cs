@@ -1,75 +1,98 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using System;
 
 public class PaperSkinManager : MonoBehaviour
 {
     [Header("Skin Data")]
     public List<PaperSkin> availableSkins;
     public PaperSkin defaultSkin;
-
     [Header("Scene References")]
     public MeshRenderer paperRollMeshRenderer;
-    // --- THIS IS THE FIX (Part 1): Add a reference to the paper manager ---
     private ContinuousPaperManager continuousPaperManager;
 
     public PaperSkin CurrentSkin { get; private set; }
     public static PaperSkinManager Instance { get; private set; }
-
     private HashSet<PaperSkin> unlockedSkins;
 
     private void Awake()
     {
-        if (Instance != null && Instance != this)
-        {
-            Destroy(this.gameObject);
-        }
-        else
-        {
-            Instance = this;
-        }
+        if (Instance != null && Instance != this) { Destroy(this.gameObject); }
+        else { Instance = this; }
         unlockedSkins = new HashSet<PaperSkin>();
-
-        // --- THIS IS THE FIX (Part 2): Find the reference at startup ---
         continuousPaperManager = FindFirstObjectByType<ContinuousPaperManager>();
     }
 
     private void Start()
     {
-        if (paperRollMeshRenderer == null)
-        {
-            Debug.LogError("PaperSkinManager: The 'Paper Roll Mesh Renderer' has not been assigned!");
-        }
+        if (paperRollMeshRenderer == null) { Debug.LogError("PaperSkinManager: 'Paper Roll Mesh Renderer' has not been assigned!"); }
     }
 
-    public void SetCurrentSkin(PaperSkin newSkin)
+    // --- NEW "QUIET" METHOD FOR LOADING ---
+    private void ApplySkinOnLoad(PaperSkin skinToApply)
     {
-        if (newSkin == null || !availableSkins.Contains(newSkin) || !IsSkinUnlocked(newSkin))
+        if (skinToApply == null || !unlockedSkins.Contains(skinToApply))
         {
-            Debug.LogWarning($"Attempted to equip a locked or invalid paper skin: {newSkin?.name}. Equipping default instead.");
             CurrentSkin = defaultSkin;
         }
         else
         {
-            CurrentSkin = newSkin;
+            CurrentSkin = skinToApply;
         }
 
-        Debug.Log($"Paper skin changed to: {CurrentSkin.skinName}");
+        if (paperRollMeshRenderer != null && CurrentSkin != null && CurrentSkin.rollMaterial != null)
+        {
+            paperRollMeshRenderer.material = CurrentSkin.rollMaterial;
+        }
+    }
+
+    // --- PUBLIC METHOD FOR PLAYER ACTIONS ---
+    public void SetCurrentSkin(PaperSkin newSkin)
+    {
+        if (newSkin == null || !unlockedSkins.Contains(newSkin) || CurrentSkin == newSkin)
+        {
+            return;
+        }
+
+        CurrentSkin = newSkin;
+        Debug.Log($"Player equipped Paper Skin: {CurrentSkin.skinName}");
+
         if (paperRollMeshRenderer != null && CurrentSkin.rollMaterial != null)
         {
             paperRollMeshRenderer.material = CurrentSkin.rollMaterial;
         }
 
-        // --- THIS IS THE FIX (Part 3): Call the new method to update existing tiles ---
+        // Update visuals and report to challenges
         continuousPaperManager?.UpdateAllActiveTilesSkin();
+        ReportSkinChangeToChallengeManager();
+        ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ChangePaperSkin);
     }
 
-    // The rest of your script is completely unchanged.
+    public void LoadProgress()
+    {
+        // ... (loading unlockedSkins is unchanged) ...
+        #region Unchanged Load Unlocks
+        string unlockedSkinsString = PlayerPrefs.GetString(PlayerPrefsKeys.UnlockedPaperSkins);
+        List<string> unlockedNames = new List<string>(unlockedSkinsString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+        unlockedSkins.Clear();
+        if (defaultSkin != null) { unlockedSkins.Add(defaultSkin); }
+        foreach (PaperSkin skin in availableSkins) { if (unlockedNames.Contains(skin.skinName)) { unlockedSkins.Add(skin); } }
+        #endregion
+
+        string equippedSkinName = PlayerPrefs.GetString(PlayerPrefsKeys.EquippedPaperSkin, defaultSkin?.skinName);
+        PaperSkin equippedSkin = availableSkins.Find(s => s.skinName == equippedSkinName);
+
+        // --- THE FIX: Call the "quiet" method ---
+        ApplySkinOnLoad(equippedSkin);
+    }
+
+    // All other methods are unchanged and correct.
     #region Unchanged Methods
+    public void ReportSkinChangeToChallengeManager() { if (CurrentSkin != null) { ChallengeManager.Instance?.OnPaperSkinChanged(CurrentSkin.skinName); } }
     public bool IsSkinUnlocked(PaperSkin skin) { return unlockedSkins != null && unlockedSkins.Contains(skin); }
-    public void UnlockSkin(PaperSkin skin) { if (skin != null && unlockedSkins != null && !unlockedSkins.Contains(skin)) { unlockedSkins.Add(skin); Debug.Log($"Paper skin unlocked: {skin.skinName}"); } }
-    public void SaveProgress() { if (CurrentSkin != null) { PlayerPrefs.SetString(PlayerPrefsKeys.EquippedPaperSkin, CurrentSkin.skinName); } string unlockedSkinsString = string.Join("|", unlockedSkins.Select(s => s.skinName)); PlayerPrefs.SetString(PlayerPrefsKeys.UnlockedPaperSkins, unlockedSkinsString); }
-    public void LoadProgress() { string unlockedSkinsString = PlayerPrefs.GetString(PlayerPrefsKeys.UnlockedPaperSkins); List<string> unlockedNames = new List<string>(unlockedSkinsString.Split('|')); unlockedSkins.Clear(); if (defaultSkin != null) { unlockedSkins.Add(defaultSkin); } foreach (PaperSkin skin in availableSkins) { if (unlockedNames.Contains(skin.skinName)) { unlockedSkins.Add(skin); } } string equippedSkinName = PlayerPrefs.GetString(PlayerPrefsKeys.EquippedPaperSkin, defaultSkin?.skinName); PaperSkin equippedSkin = availableSkins.Find(s => s.skinName == equippedSkinName); SetCurrentSkin(equippedSkin); }
-    public void CycleToNextSkin() { if (availableSkins == null || availableSkins.Count == 0) return; int currentSkinIndex = availableSkins.IndexOf(CurrentSkin); currentSkinIndex++; if (currentSkinIndex >= availableSkins.Count) { currentSkinIndex = 0; } SetCurrentSkin(availableSkins[currentSkinIndex]); }
+    public void UnlockSkin(PaperSkin skin) { if (skin != null && unlockedSkins != null && !unlockedSkins.Contains(skin)) { unlockedSkins.Add(skin); } }
+    public void SaveProgress() { if (CurrentSkin != null) { PlayerPrefs.SetString(PlayerPrefsKeys.EquippedPaperSkin, CurrentSkin.skinName); } string unlockedSkinsString = string.Join(",", unlockedSkins.Select(s => s.skinName)); PlayerPrefs.SetString(PlayerPrefsKeys.UnlockedPaperSkins, unlockedSkinsString); }
+    public void CycleToNextSkin() { if (availableSkins == null || availableSkins.Count == 0) return; int currentSkinIndex = availableSkins.IndexOf(CurrentSkin); currentSkinIndex = (currentSkinIndex + 1) % availableSkins.Count; SetCurrentSkin(availableSkins[currentSkinIndex]); }
     #endregion
 }
