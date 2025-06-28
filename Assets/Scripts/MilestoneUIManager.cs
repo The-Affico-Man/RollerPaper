@@ -14,7 +14,9 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
     public GameObject milestoneItemPrefab;
     public ScrollRect scrollRect;
     public GameObject redDotNotification;
-
+    public Transform coinUIScreenPosition;
+    public Transform coinUINormalPosition;
+    public RectTransform coinUIPanel;
     [Header("Other UI Manager References")]
     [Tooltip("Drag the GameObject that has the ShopManager script on it here.")]
     public ShopManager shopManager;
@@ -25,6 +27,7 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
     // --- THIS IS THE FIX (Part 1): Add a reference to the main canvas ---
     [Tooltip("Drag your main UI Canvas object from the scene hierarchy here.")]
     public Canvas mainCanvas;
+    public Canvas topLayerCanvas;
     [Tooltip("How long the notification stays on screen before sliding out.")]
     public float notificationDuration = 3f;
     [Tooltip("How long the celebration stays on screen before sliding out.")]
@@ -181,6 +184,10 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
 
         // Always update the central UI state
         UIStateManager.Instance?.SetUIBlockingState(isOpening);
+        if (coinUIPanel != null && coinUINormalPosition != null && coinUIScreenPosition != null)
+        {
+            coinUIPanel.position = isOpening ? coinUIScreenPosition.position : coinUINormalPosition.position;
+        }
     }
     public void CloseMilestoneScreen()
     {
@@ -189,7 +196,11 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
             milestoneScreenPanel.SetActive(false);
         }
     }
-
+    public void ShowUnlockNotification(string message)
+    {
+        // We can reuse the existing panel animation coroutine for this
+        StartCoroutine(ShowAnimatedPanel(message, notificationDuration, false)); // false = no confetti
+    }
     public void RefreshMilestoneList() { BuildMilestoneList(); }
     private void CheckForUncollectedRewards() { if (redDotNotification != null) { redDotNotification.SetActive(MilestoneManager.Instance.AreThereUncollectedRewards()); } }
     private void SetSnapPosition(int index, bool immediate = false) { if (snapPositionsX.Count == 0 || index < 0 || index >= snapPositionsX.Count) return; currentSnapTargetIndex = index; if (immediate) { Vector2 targetPosition = new Vector2(snapPositionsX[currentSnapTargetIndex], contentPanel.anchoredPosition.y); contentPanel.anchoredPosition = targetPosition; } }

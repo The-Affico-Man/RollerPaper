@@ -29,6 +29,7 @@ public class PaperRoller : MonoBehaviour
     [Header("Power-up Feedback (Drag from Scene)")]
     public Image boostTimerBar;
     public TextMeshProUGUI boostTimerText;
+    public GameObject speedBoostButton;
     public ParticleSystem boostParticles;
     public AudioClip boostStartSound;
     public AudioClip boostEndSound;
@@ -146,6 +147,7 @@ public class PaperRoller : MonoBehaviour
     {
         isBoostActive = true;
         speedMultiplier = multiplier;
+        if (speedBoostButton != null) speedBoostButton.SetActive(false);
         if (audioSource != null && boostStartSound != null) audioSource.PlayOneShot(boostStartSound);
         if (boostParticles != null) boostParticles.Play();
         if (speedLinesVFX != null) speedLinesVFX.gameObject.SetActive(true);
@@ -170,6 +172,7 @@ public class PaperRoller : MonoBehaviour
         }
         if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(false);
         if (boostTimerText != null) boostTimerText.gameObject.SetActive(false);
+        if (speedBoostButton != null) speedBoostButton.SetActive(true);
     }
     #endregion
 }

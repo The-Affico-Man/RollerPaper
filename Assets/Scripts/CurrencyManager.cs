@@ -49,6 +49,7 @@ public class CurrencyManager : MonoBehaviour
         {
             ParticleSystem effectInstance = effectGO.GetComponent<ParticleSystem>();
             effectInstance.transform.SetParent(topLayerCanvas.transform, false);
+            effectInstance.transform.SetAsLastSibling();
             effectInstance.transform.position = startWorldPosition;
 
             var emission = effectInstance.emission;
