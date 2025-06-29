@@ -10,7 +10,6 @@ public class PaperRoller : MonoBehaviour
 
     [Header("Core Components")]
     private SwipeController swipeController;
-    [Tooltip("Drag your 'Roller_Visual' object from the scene hierarchy here.")]
     public Roller visualRoller;
     private ContinuousPaperManager continuousPaperManager;
 
@@ -87,24 +86,21 @@ public class PaperRoller : MonoBehaviour
             float movementDistance = currentPullAmount * finalSensitivity * fingerBonus * speedMultiplier * Time.deltaTime;
             transform.position += Vector3.down * movementDistance;
 
-            // --- THIS IS THE FIX for Distance & Time Challenges ---
             if (continuousPaperManager != null && continuousPaperManager.paperTileLength > 0)
             {
-                // 1. Calculate the distance scrolled in REAL METERS.
                 float metersScrolledThisFrame = (movementDistance * continuousPaperManager.realWorldMetersPerTile) / continuousPaperManager.paperTileLength;
-
-                // 2. Report this correct value to the Challenge Manager.
                 ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalDistance, metersScrolledThisFrame);
-                ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalTime, Time.deltaTime);
                 ChallengeManager.Instance?.UpdateSessionScroll(metersScrolledThisFrame, Time.deltaTime);
+                if (swipeController.ActivePullingFingers >= 2)
+                {
+                    ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.UseMultipleFingers, metersScrolledThisFrame);
+                }
             }
-            // Report time separately
             ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalTime, Time.deltaTime);
-            // --------------------------------------------------------
 
             if (visualRoller != null)
             {
-                float spinAmount = movementDistance * 200f;
+                float spinAmount = movementDistance * 800f;
                 visualRoller.SpinRoller(spinAmount);
                 float shakeFactor = Mathf.Clamp01(currentPullAmount * 2f);
                 visualRoller.SetShake(shakeFactor);
@@ -125,15 +121,13 @@ public class PaperRoller : MonoBehaviour
     public void LoadProgress() { float savedDistance = PlayerPrefs.GetFloat(PlayerPrefsKeys.TotalDistancePulled, 0f); transform.position = new Vector3(transform.position.x, startYPosition - savedDistance, transform.position.z); WorldSpaceDistancePulled = startYPosition - transform.position.y; continuousPaperManager?.InitializePaperAtRollerPosition(); }
     public void AddDebugDistance(float metersToAdd) { if (continuousPaperManager == null || continuousPaperManager.paperTileLength <= 0) return; float conversionFactor = continuousPaperManager.realWorldMetersPerTile / continuousPaperManager.paperTileLength; float worldUnitsToAdd = metersToAdd / conversionFactor; transform.position += Vector3.down * worldUnitsToAdd; Debug.Log($"Added {metersToAdd} meters to the total distance."); }
 
-    // --- THIS IS THE FIX for Boost Challenges ---
     public void ActivateSpeedBoost() { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration)); }
     public void ActivateSpeedBoost(float multiplier, float duration) { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(multiplier, duration)); }
     private IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
     {
-        // Report events at the START of the boost action
+        ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.WatchRewardedAd);
         ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.UseAnyBoost);
         ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.UseSpecificBoost, 1, "TurboPaws");
-        ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.WatchRewardedAd);
 
         isBoostActive = true;
         speedMultiplier = multiplier;

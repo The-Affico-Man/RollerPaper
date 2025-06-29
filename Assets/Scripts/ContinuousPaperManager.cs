@@ -118,7 +118,7 @@ public class ContinuousPaperManager : MonoBehaviour
                 {
                     // 1. Get the RectTransform of the score text.
                     RectTransform scoreRect = paperLengthText.GetComponent<RectTransform>();
-
+                    ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.EarnCoins, coinReward);
                     // 2. This is the crucial step: Get the center of the text element in SCREEN coordinates.
                     // Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(playerCamera, scoreRect.position);
 

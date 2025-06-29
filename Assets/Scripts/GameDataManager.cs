@@ -58,7 +58,7 @@ public class GameDataManager : MonoBehaviour
         Debug.Log("GameDataManager: Loading all game data...");
 
         // Load order can be important. Challenges should load early.
-        challengeManager?.LoadProgress();
+      
         currencyManager?.LoadProgress();
         milestoneManager?.LoadProgress();
         catSkinManager?.LoadProgress();
@@ -75,7 +75,7 @@ public class GameDataManager : MonoBehaviour
         Debug.Log("GameDataManager: Saving all game data...");
 
         // Call the SaveProgress method on each manager.
-        challengeManager?.SaveProgress();
+        
         currencyManager?.SaveProgress();
         milestoneManager?.SaveProgress();
         catSkinManager?.SaveProgress();
