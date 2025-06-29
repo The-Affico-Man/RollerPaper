@@ -38,6 +38,14 @@ public class ChallengeUIManager : MonoBehaviour
     private Transform dailyChallengesContent;
     private Transform weeklyChallengesContent;
 
+    [Header("UI Interactivity")]
+    [Tooltip("Drag the parent object of your coin counter UI here.")]
+    public RectTransform coinUIPanel;
+    [Tooltip("Drag the empty GameObject for the coin UI's normal position here.")]
+    public Transform coinUINormalPosition;
+    [Tooltip("Drag the empty GameObject for the coin UI's position when this screen is open.")]
+    public Transform coinUIScreenPosition;
+
     private void Start()
     {
         // Find the content transforms from our new references. This is more robust.
@@ -69,6 +77,10 @@ public class ChallengeUIManager : MonoBehaviour
         }
         challengesPanel.SetActive(isOpening);
         UIStateManager.Instance?.SetUIBlockingState(isOpening);
+        if (coinUIPanel != null && coinUINormalPosition != null && coinUIScreenPosition != null)
+        {
+            coinUIPanel.position = isOpening ? coinUIScreenPosition.position : coinUINormalPosition.position;
+        }
     }
 
     // --- THIS METHOD IS NOW FIXED AND ROBUST ---
@@ -102,33 +114,48 @@ public class ChallengeUIManager : MonoBehaviour
         if (challengesPanel.activeSelf)
         {
             challengesPanel.SetActive(false);
+            if (coinUIPanel != null && coinUINormalPosition != null)
+            {
+                coinUIPanel.position = coinUINormalPosition.position;
+            }
         }
     }
 
     // This method is now correct because it receives the correct content parent.
     private void PopulateChallengeList(Transform contentParent, List<ChallengeState> challengeStates)
     {
+        // Clear old items first.
         foreach (Transform child in contentParent)
         {
             Destroy(child.gameObject);
         }
+
         if (challengeStates == null) return;
 
+        // Sort the list to show claimable, then in-progress, then claimed challenges.
         var sortedStates = challengeStates
-            .OrderBy(s => ChallengeManager.Instance.IsRewardClaimed(s.challenge))
-            .ThenByDescending(s => s.IsComplete());
+            .OrderBy(s => ChallengeManager.Instance.IsRewardClaimed(s.challenge)) // Claimed (true=1) are last
+            .ThenByDescending(s => s.IsComplete()); // Completed (true=1) are first among unclaimed
 
         foreach (ChallengeState state in sortedStates)
         {
             GameObject itemGO = Instantiate(challengeItemPrefab, contentParent);
-            ChallengeItemUI uiItem = itemGO.GetComponent<ChallengeItemUI>();
 
-            if (uiItem == null)
+            // Get the helper scripts from the prefab.
+            ChallengeItemUI uiItem = itemGO.GetComponent<ChallengeItemUI>();
+            ChallengeItemController itemController = itemGO.GetComponent<ChallengeItemController>(); // It should be on the root.
+
+            if (uiItem == null || itemController == null)
             {
-                Debug.LogError("ChallengeItem_Prefab is missing the ChallengeItemUI script!", itemGO);
+                Debug.LogError("ChallengeItem_Prefab is missing the ChallengeItemUI or ChallengeItemController script!", itemGO);
                 continue;
             }
 
+            // --- THE FIX: Set up the controller with its data ---
+            itemController.Setup(state, this);
+            // ---------------------------------------------------
+
+            // Populate the UI using safe references from ChallengeItemUI.
             uiItem.descriptionText.text = state.challenge.description.Replace("{goal}", $"{state.challenge.goal:N0}");
             float displayProgress = Mathf.Min(state.progress, state.challenge.goal);
             uiItem.progressText.text = $"{displayProgress:N0} / {state.challenge.goal:N0}";
@@ -140,6 +167,7 @@ public class ChallengeUIManager : MonoBehaviour
 
             if (isClaimed)
             {
+                // --- CLAIMED STATE ---
                 uiItem.progressBar.gameObject.SetActive(false);
                 uiItem.progressText.gameObject.SetActive(false);
                 uiItem.claimButtonObject.SetActive(true);
@@ -149,6 +177,7 @@ public class ChallengeUIManager : MonoBehaviour
             }
             else if (isComplete)
             {
+                // --- COMPLETED, READY TO CLAIM STATE ---
                 uiItem.progressBar.gameObject.SetActive(false);
                 uiItem.progressText.gameObject.SetActive(false);
                 uiItem.claimButtonObject.SetActive(true);
@@ -156,14 +185,13 @@ public class ChallengeUIManager : MonoBehaviour
                 uiItem.claimButton.GetComponentInChildren<TextMeshProUGUI>().text = "Claim";
                 if (uiItem.completedOverlay != null) uiItem.completedOverlay.SetActive(false);
 
+                // The button now calls its own controller's method.
                 uiItem.claimButton.onClick.RemoveAllListeners();
-                uiItem.claimButton.onClick.AddListener(() => {
-                    ChallengeManager.Instance.ClaimReward(state.challenge);
-                    RefreshUI();
-                });
+                uiItem.claimButton.onClick.AddListener(itemController.OnClaimButtonPressed);
             }
             else
             {
+                // --- IN-PROGRESS STATE ---
                 uiItem.progressBar.gameObject.SetActive(true);
                 uiItem.progressText.gameObject.SetActive(true);
                 uiItem.claimButtonObject.SetActive(false);

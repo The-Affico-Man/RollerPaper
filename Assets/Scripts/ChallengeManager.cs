@@ -119,11 +119,19 @@ public class ChallengeManager : MonoBehaviour
     public bool IsRewardClaimed(Challenge challenge)
     {
         if (challenge == null) return false;
-        string claimedKey = challenge.isDaily ? PlayerPrefsKeys.ClaimedDailies : PlayerPrefsKeys.ClaimedWeeklies;
+        string claimedKey = challenge.isDaily ? "ClaimedDailies" : "ClaimedWeeklies";
         string claimedIDs = PlayerPrefs.GetString(claimedKey, "");
+
         if (string.IsNullOrEmpty(claimedIDs)) return false;
-        return claimedIDs.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(challenge.challengeID);
+
+        // --- THIS IS THE ROBUST FIX ---
+        // We create a list from the saved string and check if the list contains our ID.
+        // This prevents partial matches (e.g., "ID1" accidentally matching "ID10").
+        List<string> claimedList = new List<string>(claimedIDs.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries));
+        return claimedList.Contains(challenge.challengeID);
+        // --- END OF FIX ---
     }
+
 
     private void ResetDailyChallenges()
     {
@@ -263,10 +271,12 @@ public class ChallengeManager : MonoBehaviour
         }
     }
 
-    [Obsolete]
-    public void ClaimReward(Challenge challenge)
+    public void ClaimReward(Challenge challenge, Vector3 rewardSourcePosition)
     {
+        // --- THIS IS THE ROBUST FIX ---
+        // We check if it is *already* claimed BEFORE doing anything else.
         if (challenge == null || IsRewardClaimed(challenge)) return;
+        // ----------------------------
 
         ChallengeState stateToClaim = challenge.isDaily
             ? ActiveDailies?.FirstOrDefault(s => s.challenge == challenge)
@@ -274,26 +284,13 @@ public class ChallengeManager : MonoBehaviour
 
         if (stateToClaim != null && stateToClaim.IsComplete())
         {
-            // --- THE FIX ---
-            // We now correctly call the CurrencyManager to give the reward.
-            // We need a reference to the UI manager to get a start position for the animation.
-            ChallengeUIManager uiManager = FindObjectOfType<ChallengeUIManager>();
-            if (uiManager != null)
-            {
-                // We'll use the position of the main "Claim" button panel as a generic start point.
-                // This assumes the panel is active when the button is clicked.
-                Vector3 startPos = uiManager.transform.position; // A reasonable default
-                CurrencyManager.Instance?.AddCoinsFromWorldPosition(challenge.coinReward, startPos);
-            }
-            else
-            {
-                // Fallback if the UI manager isn't found, just add the coins instantly.
-                CurrencyManager.Instance?.AddCoins(challenge.coinReward);
-            }
-            // --- END OF FIX ---
+            // Give the reward with animation.
+            CurrencyManager.Instance?.AddCoinsFromWorldPosition(challenge.coinReward, rewardSourcePosition);
 
+            // Mark as claimed.
             string claimedKey = challenge.isDaily ? "ClaimedDailies" : "ClaimedWeeklies";
             string claimedIDs = PlayerPrefs.GetString(claimedKey, "");
+            // We append the ID followed by a comma to ensure clean separation.
             PlayerPrefs.SetString(claimedKey, claimedIDs + challenge.challengeID + ",");
             PlayerPrefs.Save();
         }
