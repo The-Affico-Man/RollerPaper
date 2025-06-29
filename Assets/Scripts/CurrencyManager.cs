@@ -16,6 +16,10 @@ public class CurrencyManager : MonoBehaviour
     public AudioClip coinSound;
     private AudioSource audioSource;
     private Camera mainCamera;
+
+    [Tooltip("The sorting order to apply to the coin particles to ensure they draw on top of everything.")]
+    public int coinEffectSortingOrder = 50; // A high number
+
     public int CurrentCoins { get; private set; }
     public static event System.Action<int> OnCoinsChanged;
     private void Awake() { if (Instance != null && Instance != this) { Destroy(this.gameObject); } else { Instance = this; } audioSource = gameObject.AddComponent<AudioSource>(); mainCamera = Camera.main; }
@@ -48,6 +52,12 @@ public class CurrencyManager : MonoBehaviour
         if (effectGO != null)
         {
             ParticleSystem effectInstance = effectGO.GetComponent<ParticleSystem>();
+            var renderer = effectInstance.GetComponent<ParticleSystemRenderer>();
+            if (renderer != null)
+            {
+                // 2. Set its sorting order to our high value.
+                renderer.sortingOrder = coinEffectSortingOrder;
+            }
             effectInstance.transform.SetParent(topLayerCanvas.transform, false);
             effectInstance.transform.SetAsLastSibling();
             effectInstance.transform.position = startWorldPosition;

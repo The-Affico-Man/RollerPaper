@@ -95,7 +95,8 @@ public class PaperRoller : MonoBehaviour
 
                 // 2. Report this correct value to the Challenge Manager.
                 ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalDistance, metersScrolledThisFrame);
-                ChallengeManager.Instance?.UpdateScrollInOneRun(metersScrolledThisFrame, Time.deltaTime);
+                ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalTime, Time.deltaTime);
+                ChallengeManager.Instance?.UpdateSessionScroll(metersScrolledThisFrame, Time.deltaTime);
             }
             // Report time separately
             ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.ScrollTotalTime, Time.deltaTime);

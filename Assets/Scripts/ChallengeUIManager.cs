@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using TMPro;
 using System.Collections.Generic;
 using System.Linq;
+using System;
 
 public class ChallengeUIManager : MonoBehaviour
 {
@@ -45,7 +46,14 @@ public class ChallengeUIManager : MonoBehaviour
     public Transform coinUINormalPosition;
     [Tooltip("Drag the empty GameObject for the coin UI's position when this screen is open.")]
     public Transform coinUIScreenPosition;
+    [Tooltip("Drag the red dot notification image/object that is on your OpenChallengesButton here.")]
+    public GameObject redDotNotification;
 
+    [Header("Timers")]
+    [Tooltip("The text element to display the daily reset countdown.")]
+    public TextMeshProUGUI dailyTimerText;
+    [Tooltip("The text element to display the weekly reset countdown.")]
+    public TextMeshProUGUI weeklyTimerText;
     private void Start()
     {
         // Find the content transforms from our new references. This is more robust.
@@ -63,7 +71,9 @@ public class ChallengeUIManager : MonoBehaviour
         closeButton.onClick.AddListener(TogglePanel);
         dailyTabButton.onClick.AddListener(() => OpenTab(true));
         weeklyTabButton.onClick.AddListener(() => OpenTab(false));
+        UpdateRedDot();
     }
+
 
     public void TogglePanel()
     {
@@ -94,6 +104,8 @@ public class ChallengeUIManager : MonoBehaviour
         // Update tab visuals
         if (dailyTabImage != null) dailyTabImage.color = isDaily ? activeTabColor : inactiveTabColor;
         if (weeklyTabImage != null) weeklyTabImage.color = !isDaily ? activeTabColor : inactiveTabColor;
+        if (dailyTimerText != null) dailyTimerText.gameObject.SetActive(isDaily);
+        if (weeklyTimerText != null) weeklyTimerText.gameObject.SetActive(!isDaily);
     }
 
     public void RefreshUI()
@@ -120,7 +132,48 @@ public class ChallengeUIManager : MonoBehaviour
             }
         }
     }
+    void Update()
+    {
+        UpdateRedDot();
+        if (challengesPanel.activeSelf)
+        {
+            UpdateTimers();
+        }
+    }
+    private void UpdateTimers()
+    {
+        if (TimeManager.Instance == null) return;
 
+        // Update Daily Timer
+        if (dailyTimerText != null)
+        {
+            TimeSpan dailyTimeLeft = TimeManager.Instance.GetTimeUntilNextDailyReset();
+            dailyTimerText.text = $"New Dailies in: {dailyTimeLeft.Hours:D2}:{dailyTimeLeft.Minutes:D2}:{dailyTimeLeft.Seconds:D2}";
+        }
+
+        // Update Weekly Timer
+        if (weeklyTimerText != null)
+        {
+            TimeSpan weeklyTimeLeft = TimeManager.Instance.GetTimeUntilNextWeeklyReset();
+            // Show days only if more than 1 day is left
+            if (weeklyTimeLeft.TotalDays >= 1)
+            {
+                weeklyTimerText.text = $"New Weeklies in: {weeklyTimeLeft.Days}d {weeklyTimeLeft.Hours:D2}h";
+            }
+            else
+            {
+                weeklyTimerText.text = $"New Weeklies in: {weeklyTimeLeft.Hours:D2}:{weeklyTimeLeft.Minutes:D2}:{weeklyTimeLeft.Seconds:D2}";
+            }
+        }
+    }
+    private void UpdateRedDot()
+    {
+        if (redDotNotification != null && ChallengeManager.Instance != null)
+        {
+            // The dot is active if the ChallengeManager reports there are unclaimed rewards.
+            redDotNotification.SetActive(ChallengeManager.Instance.AreThereUnclaimedRewards());
+        }
+    }
     // This method is now correct because it receives the correct content parent.
     private void PopulateChallengeList(Transform contentParent, List<ChallengeState> challengeStates)
     {
@@ -182,7 +235,7 @@ public class ChallengeUIManager : MonoBehaviour
                 uiItem.progressText.gameObject.SetActive(false);
                 uiItem.claimButtonObject.SetActive(true);
                 uiItem.claimButton.interactable = true;
-                uiItem.claimButton.GetComponentInChildren<TextMeshProUGUI>().text = "Claim";
+                uiItem.claimButton.GetComponentInChildren<TextMeshProUGUI>().text = $"Claim\n<size=70%>{state.challenge.coinReward} Coins";
                 if (uiItem.completedOverlay != null) uiItem.completedOverlay.SetActive(false);
 
                 // The button now calls its own controller's method.

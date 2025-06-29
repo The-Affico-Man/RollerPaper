@@ -43,4 +43,29 @@ public class TimeManager : MonoBehaviour
     {
         return true;
     }
+    /// <summary>
+    /// Calculates the time remaining until the next daily reset (00:00 UTC).
+    /// </summary>
+    public TimeSpan GetTimeUntilNextDailyReset()
+    {
+        DateTime now = GetCurrentTime();
+        // Get tomorrow's date at midnight.
+        DateTime nextResetTime = now.Date.AddDays(1);
+        return nextResetTime - now;
+    }
+
+    /// <summary>
+    /// Calculates the time remaining until the next weekly reset (e.g., Sunday at 00:00 UTC).
+    /// </summary>
+    public TimeSpan GetTimeUntilNextWeeklyReset()
+    {
+        DateTime now = GetCurrentTime();
+        // DayOfWeek in C# starts with Sunday = 0, Monday = 1, etc.
+        // Let's say our week resets on Sunday.
+        int daysUntilSunday = (7 - (int)now.DayOfWeek) % 7;
+        if (daysUntilSunday == 0) daysUntilSunday = 7; // If today is Sunday, the next reset is 7 days away.
+
+        DateTime nextResetTime = now.Date.AddDays(daysUntilSunday);
+        return nextResetTime - now;
+    }
 }

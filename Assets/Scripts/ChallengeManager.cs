@@ -27,6 +27,8 @@ public class ChallengeManager : MonoBehaviour
 
     private float scrollDistanceThisRun = 0;
     private float continuousScrollTime = 0;
+    private float scrollDistanceThisSwipe = 0; // For "ScrollWithoutLift"
+
     private HashSet<string> usedPawSkinsThisWeek;
     private HashSet<string> usedPaperSkinsThisWeek;
 
@@ -36,6 +38,9 @@ public class ChallengeManager : MonoBehaviour
         else { Instance = this; }
         usedPawSkinsThisWeek = new HashSet<string>();
         usedPaperSkinsThisWeek = new HashSet<string>();
+        scrollDistanceThisRun = 0;
+        continuousScrollTime = 0;
+        scrollDistanceThisSwipe = 0; // Initialize the new tracker
     }
 
     // REMOVED Start(). Loading is now initiated by GameDataManager.
@@ -295,9 +300,44 @@ public class ChallengeManager : MonoBehaviour
             PlayerPrefs.Save();
         }
     }
+    public bool AreThereUnclaimedRewards()
+    {
+        // Check the daily list first
+        if (ActiveDailies != null)
+        {
+            // Use LINQ's .Any() to see if there is AT LEAST ONE item that meets the condition
+            if (ActiveDailies.Any(state => state.IsComplete() && !IsRewardClaimed(state.challenge)))
+            {
+                return true; // Found one, no need to check further
+            }
+        }
 
-    public void UpdateScrollInOneRun(float distance, float time) { scrollDistanceThisRun += distance; continuousScrollTime += time; UpdateChallengeProgress(ChallengeType.ScrollInOneRun, scrollDistanceThisRun); UpdateChallengeProgress(ChallengeType.ScrollTimeInOneRun, continuousScrollTime); }
-    public void OnScrollStopped() { continuousScrollTime = 0; }
+        // Check the weekly list
+        if (ActiveWeeklies != null)
+        {
+            if (ActiveWeeklies.Any(state => state.IsComplete() && !IsRewardClaimed(state.challenge)))
+            {
+                return true;
+            }
+        }
+
+        // If we checked both lists and found nothing, return false
+        return false;
+    }
+    public void UpdateSessionScroll(float distanceThisFrame, float timeThisFrame)
+    {
+        // Update trackers for "this session"
+        scrollDistanceThisRun += distanceThisFrame;
+        continuousScrollTime += timeThisFrame;
+        scrollDistanceThisSwipe += distanceThisFrame;
+
+        // Report progress to the challenges that care about these session values
+        UpdateChallengeProgress(ChallengeType.ScrollInOneRun, scrollDistanceThisRun);
+        UpdateChallengeProgress(ChallengeType.ScrollTimeInOneRun, continuousScrollTime);
+        UpdateChallengeProgress(ChallengeType.ScrollWithoutLift, scrollDistanceThisSwipe);
+    }
+    //public void UpdateScrollInOneRun(float distance, float time) { scrollDistanceThisRun += distance; continuousScrollTime += time; UpdateChallengeProgress(ChallengeType.ScrollInOneRun, scrollDistanceThisRun); UpdateChallengeProgress(ChallengeType.ScrollTimeInOneRun, continuousScrollTime); }
+    public void OnScrollStopped() { continuousScrollTime = 0; scrollDistanceThisSwipe = 0; }
     public void OnPawSkinChanged(string skinName) { if (usedPawSkinsThisWeek.Add(skinName)) { UpdateChallengeProgress(ChallengeType.UseDifferentPawSkins, usedPawSkinsThisWeek.Count); PlayerPrefs.SetString(PlayerPrefsKeys.UsedPawSkinsThisWeek, string.Join(",", usedPawSkinsThisWeek)); } }
     public void OnPaperSkinChanged(string skinName) { if (usedPaperSkinsThisWeek.Add(skinName)) { UpdateChallengeProgress(ChallengeType.UseDifferentPaperSkins, usedPaperSkinsThisWeek.Count); PlayerPrefs.SetString(PlayerPrefsKeys.UsedPaperSkinsThisWeek, string.Join(",", usedPaperSkinsThisWeek)); } }
     #endregion
