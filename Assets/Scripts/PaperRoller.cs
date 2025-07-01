@@ -71,10 +71,13 @@ public class PaperRoller : MonoBehaviour
         {
             lastPullAmount = Mathf.Lerp(lastPullAmount, 0f, Time.deltaTime * glideDamping);
             currentPullAmount = lastPullAmount;
+            SoundManager.Instance?.StopPaperRollingSound();
         }
 
         if (currentPullAmount > 0.001f)
         {
+            SoundManager.Instance?.StartPaperRollingSound();
+            SoundManager.Instance?.PlayRandomMeow();
             float fingerBonus = (swipeController.ActivePullingFingers > 1) ? twoFingerBonus : 1.0f;
             float finalSensitivity = pullSensitivity;
 #if UNITY_EDITOR
@@ -105,6 +108,7 @@ public class PaperRoller : MonoBehaviour
         }
         else
         {
+            
             ChallengeManager.Instance?.OnScrollStopped();
             if (visualRoller != null)
             {
@@ -112,6 +116,7 @@ public class PaperRoller : MonoBehaviour
             }
         }
         WorldSpaceDistancePulled = startYPosition - transform.position.y;
+        
     }
 
     public void SaveProgress() { PlayerPrefs.SetFloat(PlayerPrefsKeys.TotalDistancePulled, WorldSpaceDistancePulled); }

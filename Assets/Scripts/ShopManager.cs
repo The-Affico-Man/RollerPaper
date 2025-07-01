@@ -167,9 +167,41 @@ public class ShopManager : MonoBehaviour
          .ThenBy(s => s.unlockType == UnlockType.ByCoins ? 0 : 1)
          .ThenBy(s => s.priceInCoins);
         foreach (PaperSkin skin in sortedSkins) { GameObject itemGO = Instantiate(shopItemPrefab, paperContentParent); itemGO.GetComponent<ShopItemButton>().Setup(skin, this); Image itemIcon = itemGO.transform.Find("ItemIcon").GetComponent<Image>(); TextMeshProUGUI itemNameText = itemGO.transform.Find("ItemName").GetComponent<TextMeshProUGUI>(); TextMeshProUGUI unlockConditionText = itemGO.transform.Find("UnlockCondition_Text").GetComponent<TextMeshProUGUI>(); Button itemButton = itemGO.GetComponent<Button>(); TextMeshProUGUI buttonStatusText = itemGO.transform.Find("ButtonStatus_Text").GetComponent<TextMeshProUGUI>(); GameObject lockedOverlay = itemGO.transform.Find("Locked_Overlay").gameObject; GameObject equippedCheckmark = itemGO.transform.Find("Equipped_Checkmark").gameObject; itemNameText.text = skin.skinName; itemIcon.sprite = skin.thumbnail; itemIcon.enabled = (skin.thumbnail != null); bool isUnlocked = paperSkinManager.IsSkinUnlocked(skin); bool isEquipped = paperSkinManager.CurrentSkin == skin; lockedOverlay.SetActive(!isUnlocked); equippedCheckmark.SetActive(isEquipped); itemButton.interactable = !isEquipped; if (isUnlocked) { unlockConditionText.text = "Owned"; buttonStatusText.text = isEquipped ? "Equipped" : "Equip"; } else { unlockConditionText.text = GetUnlockConditionText(skin); buttonStatusText.text = "Locked"; } } }
-    public void HandleUnlockAttempt(object skinObject, Vector2 clickPosition) { if (skinObject is CatSkin catSkin) { if (catSkinManager.IsSkinUnlocked(catSkin)) { catSkinManager.SetCurrentSkin(catSkin); RefreshShop(); } else { TryUnlock(catSkin, clickPosition); } } else if (skinObject is PaperSkin paperSkin) { if (paperSkinManager.IsSkinUnlocked(paperSkin)) { paperSkinManager.SetCurrentSkin(paperSkin); RefreshShop(); } else { TryUnlock(paperSkin, clickPosition); } } }
-    private void TryUnlock(CatSkin skin, Vector2 clickPosition) { string failureReason = ""; switch (skin.unlockType) { case UnlockType.ByCoins: if (!currencyManager.TrySpendCoins(skin.priceInCoins)) failureReason = "Not enough coins!"; break; case UnlockType.ByMilestone: if (skin.requiredMilestone != null && !milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) failureReason = "Milestone not reached!"; break; case UnlockType.ByTotalDistance: if (continuousPaperManager != null) { float currentMeters = (paperRoller.WorldSpaceDistancePulled * continuousPaperManager.realWorldMetersPerTile) / continuousPaperManager.paperTileLength; if (currentMeters < skin.requiredTotalDistance) failureReason = "Not enough distance pulled!"; } break; } if (string.IsNullOrEmpty(failureReason)) { catSkinManager.UnlockSkin(skin); RefreshShop(); } else { SpawnWarningText(failureReason, clickPosition); } }
-    private void TryUnlock(PaperSkin skin, Vector2 clickPosition) { string failureReason = ""; switch (skin.unlockType) { case UnlockType.ByCoins: if (!currencyManager.TrySpendCoins(skin.priceInCoins)) failureReason = "Not enough coins!"; break; case UnlockType.ByMilestone: if (skin.requiredMilestone != null && !milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) failureReason = "Milestone not reached!"; break; case UnlockType.ByTotalDistance: if (continuousPaperManager != null) { float currentMeters = (paperRoller.WorldSpaceDistancePulled * continuousPaperManager.realWorldMetersPerTile) / continuousPaperManager.paperTileLength; if (currentMeters < skin.requiredTotalDistance) failureReason = "Not enough distance pulled!"; } break; } if (string.IsNullOrEmpty(failureReason)) { paperSkinManager.UnlockSkin(skin); RefreshShop(); } else { SpawnWarningText(failureReason, clickPosition); } }
+    public void HandleUnlockAttempt(object skinObject, Vector2 clickPosition)
+    {
+        if (skinObject is CatSkin catSkin)
+        {
+            if (catSkinManager.IsSkinUnlocked(catSkin))
+            {
+                // It's already unlocked, so this is an "Equip" action.
+                SoundManager.Instance?.PlayEquipSound();
+                catSkinManager.SetCurrentSkin(catSkin);
+                RefreshShop();
+            }
+            else
+            {
+                // It's locked, so this is a "Purchase/Unlock" attempt.
+                TryUnlock(catSkin, clickPosition);
+            }
+        }
+        else if (skinObject is PaperSkin paperSkin)
+        {
+            if (paperSkinManager.IsSkinUnlocked(paperSkin))
+            {
+                // Equip action
+                SoundManager.Instance?.PlayEquipSound();
+                paperSkinManager.SetCurrentSkin(paperSkin);
+                RefreshShop();
+            }
+            else
+            {
+                // Purchase/Unlock attempt
+                TryUnlock(paperSkin, clickPosition);
+            }
+        }
+    }
+    private void TryUnlock(CatSkin skin, Vector2 clickPosition) { string failureReason = ""; switch (skin.unlockType) { case UnlockType.ByCoins: if (!currencyManager.TrySpendCoins(skin.priceInCoins)) failureReason = "Not enough coins!"; break; case UnlockType.ByMilestone: if (skin.requiredMilestone != null && !milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) failureReason = "Milestone not reached!"; break; case UnlockType.ByTotalDistance: if (continuousPaperManager != null) { float currentMeters = (paperRoller.WorldSpaceDistancePulled * continuousPaperManager.realWorldMetersPerTile) / continuousPaperManager.paperTileLength; if (currentMeters < skin.requiredTotalDistance) failureReason = "Not enough distance pulled!"; } break; } if (string.IsNullOrEmpty(failureReason)) { SoundManager.Instance?.PlayPurchaseSuccess(); catSkinManager.UnlockSkin(skin); RefreshShop(); } else { SoundManager.Instance?.PlayPurchaseFailed(); SpawnWarningText(failureReason, clickPosition); } }
+    private void TryUnlock(PaperSkin skin, Vector2 clickPosition) { string failureReason = ""; switch (skin.unlockType) { case UnlockType.ByCoins: if (!currencyManager.TrySpendCoins(skin.priceInCoins)) failureReason = "Not enough coins!"; break; case UnlockType.ByMilestone: if (skin.requiredMilestone != null && !milestoneManager.IsMilestoneUnlocked(skin.requiredMilestone)) failureReason = "Milestone not reached!"; break; case UnlockType.ByTotalDistance: if (continuousPaperManager != null) { float currentMeters = (paperRoller.WorldSpaceDistancePulled * continuousPaperManager.realWorldMetersPerTile) / continuousPaperManager.paperTileLength; if (currentMeters < skin.requiredTotalDistance) failureReason = "Not enough distance pulled!"; } break; } if (string.IsNullOrEmpty(failureReason)) { SoundManager.Instance?.PlayPurchaseSuccess(); paperSkinManager.UnlockSkin(skin); RefreshShop(); } else { SoundManager.Instance?.PlayPurchaseFailed(); SpawnWarningText(failureReason, clickPosition); } }
     private void SpawnWarningText(string message, Vector2 screenPosition) { if (warningTextPrefab == null || mainCanvas == null) { return; } GameObject textGO = Instantiate(warningTextPrefab, mainCanvas.transform); textGO.transform.SetAsLastSibling(); RectTransform textRect = textGO.GetComponent<RectTransform>(); RectTransform canvasRect = mainCanvas.GetComponent<RectTransform>(); RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPosition, mainCanvas.worldCamera, out Vector2 localPoint); textRect.anchoredPosition = localPoint; textGO.GetComponent<TextMeshProUGUI>().text = message; }
     private void OpenTab(GameObject activeScrollView) { pawsTabScrollView.SetActive(activeScrollView == pawsTabScrollView); paperTabScrollView.SetActive(activeScrollView == paperTabScrollView); if (pawsTabImage != null)
         {
