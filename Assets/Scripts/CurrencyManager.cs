@@ -13,8 +13,6 @@ public class CurrencyManager : MonoBehaviour
     public Canvas topLayerCanvas;
     public int maxVisualCoins = 30;
     public float coinMoveDuration = 1.5f;
-    public AudioClip coinSound;
-    private AudioSource audioSource;
     private Camera mainCamera;
 
     [Tooltip("The sorting order to apply to the coin particles to ensure they draw on top of everything.")]
@@ -22,7 +20,7 @@ public class CurrencyManager : MonoBehaviour
 
     public int CurrentCoins { get; private set; }
     public static event System.Action<int> OnCoinsChanged;
-    private void Awake() { if (Instance != null && Instance != this) { Destroy(this.gameObject); } else { Instance = this; } audioSource = gameObject.AddComponent<AudioSource>(); mainCamera = Camera.main; }
+    private void Awake() { if (Instance != null && Instance != this) { Destroy(this.gameObject); } else { Instance = this; }  mainCamera = Camera.main; }
     #endregion
 
     // --- NEW PUBLIC METHOD #1 (For Buttons) ---
@@ -43,30 +41,24 @@ public class CurrencyManager : MonoBehaviour
     }
 
     // --- The Core Animation Logic (Now private) ---
-    public IEnumerator AnimateCoins(int amount, Vector3 startWorldPosition)
+    private IEnumerator AnimateCoins(int amount, Vector3 startWorldPosition)
     {
         if (topLayerCanvas == null) { AddCoins(amount); yield break; }
 
+        // --- Spawn the VISUAL particle burst ---
         GameObject effectGO = ParticlePooler.Instance?.SpawnFromPool("FlyingCoins", startWorldPosition, Quaternion.identity);
-
         if (effectGO != null)
         {
             ParticleSystem effectInstance = effectGO.GetComponent<ParticleSystem>();
             var renderer = effectInstance.GetComponent<ParticleSystemRenderer>();
-            if (renderer != null)
-            {
-                // 2. Set its sorting order to our high value.
-                renderer.sortingOrder = coinEffectSortingOrder;
-            }
+            if (renderer != null) { renderer.sortingOrder = coinEffectSortingOrder; }
             effectInstance.transform.SetParent(topLayerCanvas.transform, false);
             effectInstance.transform.SetAsLastSibling();
             effectInstance.transform.position = startWorldPosition;
-
             var emission = effectInstance.emission;
             float coinsToSpawnRatio = (float)amount / 50f;
             int burstCount = (int)Mathf.Clamp(coinsToSpawnRatio, 5, maxVisualCoins);
             emission.SetBurst(0, new ParticleSystem.Burst(0.0f, burstCount));
-
             var forceModule = effectInstance.forceOverLifetime;
             forceModule.enabled = true;
             Vector3 targetPos = coinUIText.transform.position;
@@ -75,11 +67,29 @@ public class CurrencyManager : MonoBehaviour
             forceModule.z = CreateAttractionCurve(startWorldPosition.z, targetPos.z);
         }
 
-        if (audioSource != null && coinSound != null)
-        {
-            audioSource.PlayOneShot(coinSound);
-        }
+        // --- Play the SOUNDS ---
+        // We will now start a separate coroutine to handle playing the sounds in sync.
+        StartCoroutine(PlayCoinSounds(amount));
+
+        // Add the coins to the total immediately.
         AddCoins(amount);
+    }
+
+    // This coroutine plays a stream of sounds.
+    private IEnumerator PlayCoinSounds(int amount)
+    {
+        float coinsToPlayRatio = (float)amount / 50f;
+        int numberOfSoundsToPlay = (int)Mathf.Clamp(coinsToPlayRatio, 5, 15); // Limit the number of sounds to prevent audio spam
+
+        // Stagger the sound playback over a short duration
+        float totalSoundDuration = 0.5f;
+        float delayBetweenSounds = totalSoundDuration / numberOfSoundsToPlay;
+
+        for (int i = 0; i < numberOfSoundsToPlay; i++)
+        {
+            SoundManager.Instance?.PlayCoinSound();
+            yield return new WaitForSeconds(delayBetweenSounds);
+        }
     }
 
     // --- The rest of the script is unchanged and correct ---

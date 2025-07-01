@@ -126,6 +126,7 @@ public class ContinuousPaperManager : MonoBehaviour
                     //    already knows how to handle this correctly for its canvas.
                     Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(playerCamera, paperLengthText.transform.position);
                     CurrencyManager.Instance.AddCoinsFromScreenPosition(coinReward, screenPoint);
+                    SoundManager.Instance?.PlayRandomPurr();
                 }
                 // --- END OF FIX ---
 

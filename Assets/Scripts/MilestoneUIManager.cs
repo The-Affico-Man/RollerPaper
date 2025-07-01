@@ -88,6 +88,7 @@ public class MilestoneUIManager : MonoBehaviour, IBeginDragHandler, IEndDragHand
             StartCoroutine(ShowAnimatedPanel(message, celebrationDuration, true));
             Vector3 spawnPos = confettiSpawnPoint != null ? confettiSpawnPoint.position : Vector3.zero;
             ParticlePooler.Instance?.SpawnFromPool("Confetti", spawnPos, Quaternion.identity);
+            SoundManager.Instance?.PlayMilestoneTriumph();
             FindNextMilestone();
         }
     }

@@ -48,7 +48,7 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     public TimeSpan GetTimeUntilNextDailyReset()
     {
-        DateTime now = GetCurrentTime();
+        DateTime now = DateTime.Now;
         // Get tomorrow's date at midnight.
         DateTime nextResetTime = now.Date.AddDays(1);
         return nextResetTime - now;
@@ -59,7 +59,7 @@ public class TimeManager : MonoBehaviour
     /// </summary>
     public TimeSpan GetTimeUntilNextWeeklyReset()
     {
-        DateTime now = GetCurrentTime();
+        DateTime now = DateTime.Now;
         // DayOfWeek in C# starts with Sunday = 0, Monday = 1, etc.
         // Let's say our week resets on Sunday.
         int daysUntilSunday = (7 - (int)now.DayOfWeek) % 7;
