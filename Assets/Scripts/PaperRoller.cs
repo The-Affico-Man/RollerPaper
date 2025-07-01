@@ -28,7 +28,11 @@ public class PaperRoller : MonoBehaviour
     public TextMeshProUGUI boostTimerText;
     public GameObject speedBoostButton;
     public ParticleSystem boostParticles;
-    
+    [Header("Haptic Feedback")]
+    [Tooltip("How many world units the paper must scroll to trigger one haptic tick.")]
+    public float distancePerHapticTick = 0.1f;
+    private float distanceScrolledSinceLastTick = 0f;
+
     public Image speedLinesVFX;
     public float speedLinesShakeAmount = 15f;
     private float lastPullAmount = 0;
@@ -85,7 +89,13 @@ public class PaperRoller : MonoBehaviour
 #endif
             float movementDistance = currentPullAmount * finalSensitivity * fingerBonus * speedMultiplier * Time.deltaTime;
             transform.position += Vector3.down * movementDistance;
-
+            distanceScrolledSinceLastTick += movementDistance;
+            if (distanceScrolledSinceLastTick >= distancePerHapticTick)
+            {
+                // 3. Play the tick and reset the tracker.
+                HapticManager.Instance?.PlayTick();
+                distanceScrolledSinceLastTick = 0f;
+            }
             if (continuousPaperManager != null && continuousPaperManager.paperTileLength > 0)
             {
                 float metersScrolledThisFrame = (movementDistance * continuousPaperManager.realWorldMetersPerTile) / continuousPaperManager.paperTileLength;
