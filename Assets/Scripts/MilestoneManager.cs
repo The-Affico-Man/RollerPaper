@@ -53,6 +53,7 @@ public class MilestoneManager : MonoBehaviour
         {
             // Call the new, specific method for world positions
             CurrencyManager.Instance.AddCoinsFromWorldPosition(milestone.coinReward, startWorldPosition);
+            HapticManager.Instance?.PlaySuccessHaptic();
         }
         collectedRewards.Add(milestone);
     }

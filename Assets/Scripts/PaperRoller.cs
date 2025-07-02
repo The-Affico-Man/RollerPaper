@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections;
 using TMPro;
 using UnityEngine.UI;
+using Solo.MOST_IN_ONE;
 
 public class PaperRoller : MonoBehaviour
 {
@@ -93,7 +94,8 @@ public class PaperRoller : MonoBehaviour
             if (distanceScrolledSinceLastTick >= distancePerHapticTick)
             {
                 // 3. Play the tick and reset the tracker.
-                HapticManager.Instance?.PlayTick();
+                HapticManager.Instance?.PlayScrollTickHaptic();
+
                 distanceScrolledSinceLastTick = 0f;
             }
             if (continuousPaperManager != null && continuousPaperManager.paperTileLength > 0)

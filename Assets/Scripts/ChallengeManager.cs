@@ -218,7 +218,7 @@ public class ChallengeManager : MonoBehaviour
         if (stateToClaim != null && stateToClaim.IsComplete())
         {
             CurrencyManager.Instance?.AddCoinsFromWorldPosition(challenge.coinReward, rewardSourcePosition);
-            HapticManager.Instance?.PlaySuccess();
+            HapticManager.Instance?.PlaySuccessHaptic();
             string claimedKey = challenge.isDaily ? PlayerPrefsKeys.ClaimedDailies : PlayerPrefsKeys.ClaimedWeeklies;
             string claimedIDs = PlayerPrefs.GetString(claimedKey, "");
             PlayerPrefs.SetString(claimedKey, claimedIDs + challenge.challengeID + ",");

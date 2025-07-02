@@ -1,64 +1,59 @@
 using UnityEngine;
+using Solo.MOST_IN_ONE; // Make sure you have this using statement
+using System.Collections; // Required for Coroutines
 
-/// <summary>
-/// A simple, universal haptic feedback manager that uses the built-in
-/// Handheld.Vibrate() for cross-platform compatibility on iOS and Android.
-/// </summary>
 public class HapticManager : MonoBehaviour
 {
     public static HapticManager Instance { get; private set; }
 
-    [Tooltip("A master switch to easily enable or disable all haptic feedback.")]
+    [Header("Master Switch")]
+    [Tooltip("Check this box to enable haptic feedback throughout the game.")]
     public bool hapticsEnabled = true;
 
-    // --- THIS IS THE NEW, TWEAKABLE VARIABLE ---
-    [Header("Tick Cooldown")]
-    [Tooltip("The minimum time (in seconds) that must pass between each paper scroll 'tick'. A higher value makes the haptics feel weaker and less aggressive.")]
-    [Range(0.01f, 0.2f)]
-    public float timeBetweenTicks = 0.05f;
-    // ------------------------------------------
-
-    private float cooldownTimer = 0f;
+    // --- THIS IS THE NEW PART: Define our custom pattern ---
+    private Most_HapticFeedback.CustomHapticPattern scrollTickPattern;
+    // --------------------------------------------------------
 
     private void Awake()
     {
         if (Instance != null && Instance != this) { Destroy(gameObject); }
         else { Instance = this; DontDestroyOnLoad(gameObject); }
+
+        // --- THIS IS THE NEW PART: Create the pattern data on startup ---
+        // For iOS, we fall back to a light preset.
+        var iosHaptic = new Most_HapticFeedback.IOS_Haptic(Most_HapticFeedback.HapticTypes.LightImpact, 0);
+
+        // For Android, we define our custom light tap.
+        // Vibrate for 5ms at a low intensity of 40.
+        var androidHaptic = new Most_HapticFeedback.Android_Haptic(0, 5, 40);
+
+        // Combine them into a single pattern structure.
+        scrollTickPattern = new Most_HapticFeedback.CustomHapticPattern(
+            new Most_HapticFeedback.IOS_Haptic[] { iosHaptic },
+            new Most_HapticFeedback.Android_Haptic[] { androidHaptic }
+        );
+        // -----------------------------------------------------------------
     }
 
-    private void Update()
+    // --- THIS IS THE CORRECTED METHOD ---
+    public void PlayScrollTickHaptic()
     {
-        if (cooldownTimer > 0)
-        {
-            cooldownTimer -= Time.deltaTime;
-        }
+        if (!hapticsEnabled) return;
+
+        // Now, we use the public method provided by the asset to play our custom pattern.
+        // We need to play it inside a coroutine.
+        StartCoroutine(Most_HapticFeedback.GeneratePattern(scrollTickPattern));
     }
 
-    private void Vibrate()
+    public void PlaySuccessHaptic()
     {
-        if (hapticsEnabled && SystemInfo.supportsVibration)
-        {
-            Handheld.Vibrate();
-        }
+        if (!hapticsEnabled) return;
+        Most_HapticFeedback.Generate(Most_HapticFeedback.HapticTypes.Success);
     }
 
-    // --- THIS METHOD IS NOW BACK TO ITS SIMPLER FORM ---
-    /// <summary>
-    /// A short, sharp "tick" - perfect for the paper texture feel.
-    /// This includes a cooldown to prevent overwhelming the device's motor.
-    /// </summary>
-    public void PlayTick()
+    public void PlayFailureHaptic()
     {
-        // Only play a tick if the cooldown has finished.
-        if (cooldownTimer <= 0)
-        {
-            // Reset the cooldown using our new public variable.
-            cooldownTimer = timeBetweenTicks;
-            Vibrate();
-        }
+        if (!hapticsEnabled) return;
+        Most_HapticFeedback.Generate(Most_HapticFeedback.HapticTypes.Failure);
     }
-
-    // --- All other methods are unchanged ---
-    public void PlaySuccess() { Vibrate(); }
-    public void PlayFailure() { Vibrate(); }
 }
