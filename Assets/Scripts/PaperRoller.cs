@@ -135,7 +135,24 @@ public class PaperRoller : MonoBehaviour
     public void LoadProgress() { float savedDistance = PlayerPrefs.GetFloat(PlayerPrefsKeys.TotalDistancePulled, 0f); transform.position = new Vector3(transform.position.x, startYPosition - savedDistance, transform.position.z); WorldSpaceDistancePulled = startYPosition - transform.position.y; continuousPaperManager?.InitializePaperAtRollerPosition(); }
     public void AddDebugDistance(float metersToAdd) { if (continuousPaperManager == null || continuousPaperManager.paperTileLength <= 0) return; float conversionFactor = continuousPaperManager.realWorldMetersPerTile / continuousPaperManager.paperTileLength; float worldUnitsToAdd = metersToAdd / conversionFactor; transform.position += Vector3.down * worldUnitsToAdd; Debug.Log($"Added {metersToAdd} meters to the total distance."); }
 
-    public void ActivateSpeedBoost() { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration)); }
+    public void ActivateSpeedBoost()
+    {
+        if (BoosterManager.Instance != null && BoosterManager.Instance.CanUseTurboPaws())
+        {
+            BoosterManager.Instance.UseTurboPaws(); // Decrement the count
+
+            // The rest of the logic can be moved to a private method
+            // to be called by ads later.
+            StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration));
+        }
+        else
+        {
+            Debug.Log("No free Turbo Paws uses left. Prompt for an ad here.");
+            // FUTURE: This is where you would call your AdManager to show a rewarded ad.
+            // For now, we can just play a failure sound.
+            SoundManager.Instance?.PlayPurchaseFailed();
+        }
+    }
     public void ActivateSpeedBoost(float multiplier, float duration) { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(multiplier, duration)); }
     private IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
     {

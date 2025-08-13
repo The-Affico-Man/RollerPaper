@@ -117,15 +117,14 @@ public class ContinuousPaperManager : MonoBehaviour
                 if (coinReward > 0)
                 {
                     // 1. Get the RectTransform of the score text.
-                    RectTransform scoreRect = paperLengthText.GetComponent<RectTransform>();
-                    ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.EarnCoins, coinReward);
-                    // 2. This is the crucial step: Get the center of the text element in SCREEN coordinates.
-                    // Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(playerCamera, scoreRect.position);
+                    float multiplier = (BoosterManager.Instance != null) ? BoosterManager.Instance.CoinMultiplier : 1f;
+                    int finalCoinReward = Mathf.RoundToInt(coinReward * multiplier);
 
-                    // 3. Now, call the animation with the reliable screen point. The CurrencyManager
-                    //    already knows how to handle this correctly for its canvas.
+                    // 2. Use the finalCoinReward for everything else.
+                    RectTransform scoreRect = paperLengthText.GetComponent<RectTransform>();
+                    ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.EarnCoins, finalCoinReward);
                     Vector2 screenPoint = RectTransformUtility.WorldToScreenPoint(playerCamera, paperLengthText.transform.position);
-                    CurrencyManager.Instance.AddCoinsFromScreenPosition(coinReward, screenPoint);
+                    CurrencyManager.Instance.AddCoinsFromScreenPosition(finalCoinReward, screenPoint);
                     SoundManager.Instance?.PlayRandomPurr();
                 }
                 // --- END OF FIX ---
