@@ -15704,19 +15704,9 @@ MonoBehaviour:
   luckyCatDuration: 60
   luckyCatCost: 500
   luckyCatCoinMultiplier: 2
-  luckyCatIcon: {fileID: 0}
+  luckyCatIcon: {fileID: -995151862, guid: 85703ee0d52ea0d479ea35a4259a0b41, type: 3}
   turboPawsFreeDailyUses: 3
-  turboPawsIcon: {fileID: 0}
-  activeTurboPawUIPanel: {fileID: 0}
-  activeTurboPawIcon: {fileID: 0}
-  activeTurboPawTimerFill: {fileID: 0}
-  activeTurboPawTimerText: {fileID: 0}
-  activeLuckyCatUIPanel: {fileID: 0}
-  activeLuckyCatIcon: {fileID: 0}
-  activeLuckyCatTimerFill: {fileID: 0}
-  activeLuckyCatTimerText: {fileID: 0}
-  useLuckyCatButton: {fileID: 241021203}
-  luckyCatInventoryText: {fileID: 419948453}
+  turboPawsIcon: {fileID: -2035932947, guid: 85703ee0d52ea0d479ea35a4259a0b41, type: 3}
 --- !u!4 &1787405706
 Transform:
   m_ObjectHideFlags: 0
@@ -15747,14 +15737,22 @@ MonoBehaviour:
   panelAnimator: {fileID: 2090985396}
   closeBlocker: {fileID: 2122083284}
   pullTabButton: {fileID: 319972237}
+  turboPawItemContainer: {fileID: 600983599}
   turboPawCountText: {fileID: 1496015438}
   useTurboPawButton: {fileID: 1810671800}
   getMoreTurboPawsButton: {fileID: 996460558}
   turboPawSelectionOverlay: {fileID: 1142093263}
+  luckyCatItemContainer: {fileID: 390559332}
   luckyCatCountText: {fileID: 478325238}
   useLuckyCatButton: {fileID: 359011479}
   getMoreLuckyCatsButton: {fileID: 1945471472}
   luckyCatSelectionOverlay: {fileID: 1139272053}
+  activeTurboPawUIPanel: {fileID: 0}
+  activeTurboPawTimerFill: {fileID: 0}
+  activeTurboPawTimerText: {fileID: 0}
+  activeLuckyCatUIPanel: {fileID: 0}
+  activeLuckyCatTimerFill: {fileID: 0}
+  activeLuckyCatTimerText: {fileID: 0}
 --- !u!1 &1797358092
 GameObject:
   m_ObjectHideFlags: 0
