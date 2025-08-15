@@ -37,7 +37,7 @@ public class PaperRoller : MonoBehaviour
     public Image speedLinesVFX;
     public float speedLinesShakeAmount = 15f;
     private float lastPullAmount = 0;
-    private bool isBoostActive = false;
+    public bool isBoostActive = false;
     private Vector3 initialSpeedLinesPosition;
 
     void Awake()
@@ -135,73 +135,59 @@ public class PaperRoller : MonoBehaviour
     public void LoadProgress() { float savedDistance = PlayerPrefs.GetFloat(PlayerPrefsKeys.TotalDistancePulled, 0f); transform.position = new Vector3(transform.position.x, startYPosition - savedDistance, transform.position.z); WorldSpaceDistancePulled = startYPosition - transform.position.y; continuousPaperManager?.InitializePaperAtRollerPosition(); }
     public void AddDebugDistance(float metersToAdd) { if (continuousPaperManager == null || continuousPaperManager.paperTileLength <= 0) return; float conversionFactor = continuousPaperManager.realWorldMetersPerTile / continuousPaperManager.paperTileLength; float worldUnitsToAdd = metersToAdd / conversionFactor; transform.position += Vector3.down * worldUnitsToAdd; Debug.Log($"Added {metersToAdd} meters to the total distance."); }
 
+    public void ActivateSpeedBoost(float multiplier, float duration)
+    {
+        // Safety check: Don't start a new boost if one is already running.
+        if (isBoostActive) return;
+
+        // Start the coroutine that handles the actual gameplay effects.
+        StartCoroutine(SpeedBoostCoroutine(multiplier, duration));
+    }
+
+    // Overload method for simple button clicks that use default values.
     public void ActivateSpeedBoost()
     {
-        if (BoosterManager.Instance != null && BoosterManager.Instance.CanUseTurboPaws())
-        {
-            BoosterManager.Instance.UseTurboPaws(); // Decrement the count
-
-            // The rest of the logic can be moved to a private method
-            // to be called by ads later.
-            StartCoroutine(SpeedBoostCoroutine(boostMultiplier, boostDuration));
-        }
-        else
-        {
-            Debug.Log("No free Turbo Paws uses left. Prompt for an ad here.");
-            // FUTURE: This is where you would call your AdManager to show a rewarded ad.
-            // For now, we can just play a failure sound.
-            SoundManager.Instance?.PlayPurchaseFailed();
-        }
+        ActivateSpeedBoost(boostMultiplier, boostDuration);
     }
-    public void ActivateSpeedBoost(float multiplier, float duration) { if (isBoostActive) return; StartCoroutine(SpeedBoostCoroutine(multiplier, duration)); }
+
+    // This coroutine now ONLY handles gameplay effects (speed, particles, sound).
     private IEnumerator SpeedBoostCoroutine(float multiplier, float duration)
     {
-        // --- This part is for the Challenge System and is correct ---
-        ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.WatchRewardedAd);
+        // --- Challenge System Logic ---
         ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.UseAnyBoost);
         ChallengeManager.Instance?.UpdateChallengeProgress(ChallengeType.UseSpecificBoost, 1, "TurboPaws");
 
+        // --- Set Gameplay State ---
         isBoostActive = true;
         speedMultiplier = multiplier;
 
-        // --- THIS IS THE FIX ---
-        // Hide the button and start the boost music via the SoundManager
+        // --- IMPORTANT: Notify the UI that the boost has STARTED ---
+        BoosterManager.Instance?.NotifyDataChanged();
+
+        // --- Activate Gameplay Feedback (Sound, Particles, etc.) ---
         if (speedBoostButton != null) speedBoostButton.SetActive(false);
         SoundManager.Instance?.StartSpeedBoostMusic();
-        // ---------------------
-
-        // The rest of the visual effect logic is unchanged
         if (boostParticles != null) boostParticles.Play();
         if (speedLinesVFX != null) speedLinesVFX.gameObject.SetActive(true);
-        if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(true);
-        if (boostTimerText != null) boostTimerText.gameObject.SetActive(true);
 
-        // The main timer loop is unchanged
-        float timeLeft = duration;
-        while (timeLeft > 0)
-        {
-            timeLeft -= Time.deltaTime;
-            if (boostTimerBar != null) { boostTimerBar.fillAmount = timeLeft / duration; }
-            if (boostTimerText != null) { boostTimerText.text = timeLeft.ToString("F1"); }
-            yield return null;
-        }
+        // --- Wait for the boost duration to pass ---
+        yield return new WaitForSeconds(duration);
 
-        // --- THIS IS THE FIX for when the boost ends ---
-        // Reset the state and tell the SoundManager to resume the normal music
+        // --- Reset Gameplay State ---
         speedMultiplier = 1.0f;
         isBoostActive = false;
-        SoundManager.Instance?.StopSpeedBoostMusic();
-        // ---------------------------------------------
 
-        // The rest of the visual cleanup is unchanged
+        // --- Deactivate Gameplay Feedback ---
+        SoundManager.Instance?.StopSpeedBoostMusic();
         if (boostParticles != null) boostParticles.Stop();
         if (speedLinesVFX != null)
         {
             speedLinesVFX.rectTransform.anchoredPosition = initialSpeedLinesPosition;
             speedLinesVFX.gameObject.SetActive(false);
         }
-        if (boostTimerBar != null) boostTimerBar.gameObject.SetActive(false);
-        if (boostTimerText != null) boostTimerText.gameObject.SetActive(false);
         if (speedBoostButton != null) speedBoostButton.SetActive(true);
+
+        // --- IMPORTANT: Notify the UI that the boost has ENDED ---
+        BoosterManager.Instance?.NotifyDataChanged();
     }
 }
